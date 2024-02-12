@@ -1,46 +1,39 @@
 package org.example;
 
-import org.example.Dao.CourseDao;
-import org.example.Dao.GroupDao;
-import org.example.Dao.StudentCourseDao;
-import org.example.Dao.StudentDao;
-import org.example.Entity.Group;
-import org.example.Entity.Student;
-import org.example.Entity.StudentCourse;
-import org.example.Factory.ServiceFactory;
-import org.example.Service.CourseService;
-import org.example.Service.GroupService;
-import org.example.Service.StudentCourseService;
-import org.example.Service.StudentService;
+import org.example.entity.Group;
+import org.example.entity.Student;
+import org.example.factory.ConnectionFactory;
+import org.example.factory.ServiceFactory;
+import org.example.service.CourseService;
+import org.example.service.GroupService;
+import org.example.service.StudentService;
 
 import java.util.Scanner;
 
 public class ConsoleApplication {
     private Scanner scanner;
-    private DatabaseSetup databaseSetup;
+    private DatabaseSetupManager databaseSetupManager;
     private StudentService studentService;
     private GroupService groupService;
     private CourseService courseService;
-    private StudentCourseService studentCourseService;
 
     public ConsoleApplication(ServiceFactory serviceFactory, ConnectionFactory connectionFactory) {
         studentService = serviceFactory.getStudentService();
         groupService = serviceFactory.getGroupService();
         courseService = serviceFactory.getCourseService();
-        studentCourseService = serviceFactory.getStudentCourseService();
 
-        databaseSetup = new DatabaseSetup(new FileReader(), connectionFactory, studentService, courseService, groupService, studentCourseService);
+        databaseSetupManager = new DatabaseSetupManager(new FileReader(), connectionFactory, studentService, courseService, groupService);
 
         scanner = new Scanner(System.in);
     }
 
-    public void initialisationDatabase() {
-        databaseSetup.dropTables();
-        databaseSetup.createTable();
-        databaseSetup.insertGroup();
-        databaseSetup.insertCourses();
-        databaseSetup.insertRandomStudents();
-        databaseSetup.insertStudentCourse();
+    public void databaseInitialization() {
+        databaseSetupManager.dropTables();
+        databaseSetupManager.createTable();
+        databaseSetupManager.insertGroup();
+        databaseSetupManager.insertCourses();
+        databaseSetupManager.insertRandomStudents();
+        databaseSetupManager.insertStudentCourse();
     }
 
     public void start() {
@@ -101,7 +94,7 @@ public class ConsoleApplication {
         System.out.print("Write numbers: ");
         int numbers = scanner.nextInt();
 
-        groupService.getGroupLargeStudent(numbers).stream().forEach(group -> System.out.println(group.getName()));
+        groupService.getGroupsGreaterOrEqualsStudents(numbers).stream().forEach(group -> System.out.println(group.getName()));
     }
 
     public void findAllStudentsInCourse() {
@@ -127,10 +120,10 @@ public class ConsoleApplication {
             System.out.print("Choose a group: ");
             group.setName(scanner.next());
             group = groupService.getGroupByName(group.getName());
-            if (group.getId() == 0) {
+            if (group == null) {
                 System.out.println("Group name is not valid");
             }
-        } while (group.getId() == 0);
+        } while (group == null);
 
         student.setGroupId(group.getId());
 
@@ -147,11 +140,11 @@ public class ConsoleApplication {
 
             student = studentService.getStudentById(student.getId());
 
-            if (student.getId() == 0) {
+            if (student == null) {
                 System.out.println("Unfaithful ID");
             }
 
-        } while (student.getId() == 0);
+        } while (student == null);
 
         studentService.delete(student);
     }
@@ -161,14 +154,12 @@ public class ConsoleApplication {
 
         displayAllCourses();
 
-        StudentCourse studentCourse = new StudentCourse();
-
         System.out.println("Choose course: ");
-        studentCourse.setCourseId(courseService.getCourseByName(scanner.nextLine()).getId());
+        int courseId = courseService.getCourseByName(scanner.nextLine()).getId();
         System.out.println("Write student id: ");
-        studentCourse.setStudentId(scanner.nextInt());
+        int studentId = scanner.nextInt();
 
-        studentCourseService.addStudentToCourse(studentCourse);
+        studentService.addStudentToCourse(studentId, courseId);
     }
 
     public void removeStudentFromCourse() {
@@ -176,16 +167,12 @@ public class ConsoleApplication {
 
         displayAllCourses();
 
-        StudentCourse studentCourse = new StudentCourse();
-
-
         System.out.print("Choose course: ");
-        studentCourse.setCourseId(courseService.getCourseByName(scanner.nextLine()).getId());
+        int courseId = courseService.getCourseByName(scanner.nextLine()).getId();
         System.out.print("Write student id: ");
-        studentCourse.setStudentId(scanner.nextInt());
+        int studentId = scanner.nextInt();
 
-
-        studentCourseService.deleteStudentFromCourse(studentCourse);
+        studentService.addStudentToCourse(courseId, studentId);
     }
 
     public void displayAllCourses() {

@@ -1,13 +1,12 @@
 package org.example;
 
-import org.example.Entity.Course;
-import org.example.Entity.Group;
-import org.example.Entity.Student;
-import org.example.Entity.StudentCourse;
-import org.example.Service.CourseService;
-import org.example.Service.GroupService;
-import org.example.Service.StudentCourseService;
-import org.example.Service.StudentService;
+import org.example.entity.Course;
+import org.example.entity.Group;
+import org.example.entity.Student;
+import org.example.factory.ConnectionFactory;
+import org.example.service.CourseService;
+import org.example.service.GroupService;
+import org.example.service.StudentService;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,21 +14,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class DatabaseSetup {
+public class DatabaseSetupManager {
     private FileReader reader;
     private ConnectionFactory factory;
     private StudentService studentService;
     private CourseService courseService;
     private GroupService groupService;
-    private StudentCourseService studentCourseService;
 
-    public DatabaseSetup(FileReader reader, ConnectionFactory factory, StudentService studentService, CourseService courseService, GroupService groupService, StudentCourseService studentCourseService) {
+    public DatabaseSetupManager(FileReader reader, ConnectionFactory factory, StudentService studentService, CourseService courseService, GroupService groupService) {
         this.reader = reader;
         this.factory = factory;
 
         this.studentService = studentService;
         this.courseService = courseService;
-        this.studentCourseService = studentCourseService;
         this.groupService = groupService;
     }
 
@@ -100,18 +97,21 @@ public class DatabaseSetup {
     }
 
     public void insertStudentCourse() {
-        List<StudentCourse> studentCourses = new ArrayList<>();
-
         Random random = new Random();
-        for (int i = 0; i < 200; i++) {
-            StudentCourse studentCourse = new StudentCourse();
-            studentCourse.setStudentId(i + 1);
-            studentCourse.setCourseId(random.nextInt(1, 11));
 
-            studentCourses.add(studentCourse);
+        for (int i = 1; i < 11; i++) {
+            int numberStudents = random.nextInt(0, 30);
+            List<Integer> students = new ArrayList<>(numberStudents);
+
+            for (int j = 0; j < numberStudents; j++) {
+                int studentId = random.nextInt(1, 201);
+                if (!students.contains(studentId)) {
+                    students.add(studentId);
+                }
+            }
+
+            studentService.addStudentsOnCourse(i, students.stream().map(id -> new Student(id)).toList());
         }
-
-        studentCourseService.addStudentToCourses(studentCourses);
     }
 
     public void insertCourses() {

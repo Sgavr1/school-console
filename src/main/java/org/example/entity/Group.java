@@ -1,8 +1,14 @@
-package org.example.Entity;
+package org.example.entity;
+
+import org.example.map.Column;
+import java.util.List;
 
 public class Group {
+    @Column(name = "group_id")
     private int id;
+    @Column(name = "group_name")
     private String name;
+    private List<Student> students;
 
     public Group() {
 
@@ -26,5 +32,13 @@ public class Group {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
     }
 }

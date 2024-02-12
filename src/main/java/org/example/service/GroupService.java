@@ -1,7 +1,7 @@
-package org.example.Service;
+package org.example.service;
 
-import org.example.Dao.GroupDao;
-import org.example.Entity.Group;
+import org.example.dao.GroupDao;
+import org.example.entity.Group;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ public class GroupService {
         this.groupDao = groupDao;
     }
 
-    public List<Group> getGroupLargeStudent(int numbers) {
-        return groupDao.getGroupLargeOrEqualsStudents(numbers);
+        public List<Group> getGroupsGreaterOrEqualsStudents(int amountStudents) {
+        return groupDao.getGroupGreaterOrEqualsStudents(amountStudents);
     }
 
     public void addGroup(Group group) {
@@ -29,6 +29,6 @@ public class GroupService {
     }
 
     public Group getGroupByName(String name) {
-        return groupDao.getGroupByName(name).orElse(new Group());
+        return groupDao.getGroupByName(name).orElse(null);
     }
 }

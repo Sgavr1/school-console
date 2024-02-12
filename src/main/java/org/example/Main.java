@@ -1,16 +1,19 @@
 package org.example;
 
-import org.example.Factory.DaoFactory;
-import org.example.Factory.ServiceFactory;
+import org.example.factory.ConnectionFactory;
+import org.example.factory.DaoFactory;
+import org.example.factory.ServiceFactory;
+import org.example.map.EntityMapper;
 
 public class Main {
     public static void main(String[] args) {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        DaoFactory daoFactory = new DaoFactory(connectionFactory);
+        EntityMapper mapper = new EntityMapper();
+        DaoFactory daoFactory = new DaoFactory(connectionFactory, mapper);
         ServiceFactory serviceFactory = new ServiceFactory(daoFactory);
 
         ConsoleApplication consoleApplication = new ConsoleApplication(serviceFactory, connectionFactory);
-        consoleApplication.initialisationDatabase();
+        consoleApplication.databaseInitialization();
         consoleApplication.start();
     }
 }
