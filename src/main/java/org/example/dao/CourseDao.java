@@ -11,13 +11,25 @@ import java.util.Optional;
 
 public class CourseDao {
     private final static String QUERY_INSERT = "INSERT INTO courses(course_name, course_description) VALUES(?,?);";
-    private final static String QUERY_SELECT_ALL = "SELECT * FROM courses;";
-    private final static String QUERY_SELECT_BY_NAME = "SELECT * FROM courses WHERE course_name = ?;";
-    private final static String QUERY_SELECT_ALL_BY_STUDENT_ID = """
-            SELECT courses.course_id, course_name, description
+    private final static String QUERY_SELECT_ALL = """
+            SELECT courses.*, students.*
             FROM courses
-            JOIN student_course ON student_course.course_id = courses.course_id
-            WHERE student_id = ?;
+            LEFT JOIN student_course ON student_course.course_id = courses.course_id
+            JOIN students ON students.student_id = student_course.student_id;
+            """;
+    private final static String QUERY_SELECT_BY_NAME = """
+            SELECT courses.*, students.*
+            FROM courses
+            LEFT JOIN student_course ON student_course.course_id = courses.course_id
+            JOIN students ON students.student_id = student_course.student_id
+            WHERE courses.course_name = ?;
+            """;
+    private final static String QUERY_SELECT_ALL_BY_STUDENT_ID = """
+            SELECT courses.*, students.*
+            FROM students
+            LEFT JOIN student_course ON student_course.student_id = students.student_id
+            JOIN courses ON courses.course_id = student_course.course_id
+            WHERE students.student_id = ?;
             """;
     private ConnectionFactory factory;
     private EntityMapper mapper;
@@ -29,8 +41,7 @@ public class CourseDao {
 
     public void insert(Course course) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT)) {
             statement.setString(1, course.getName());
             statement.setString(2, course.getDescription());
 
@@ -43,8 +54,7 @@ public class CourseDao {
 
     public void insertList(List<Course> courses) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT);) {
-            connection.setAutoCommit(false);
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT)) {
             for (Course course : courses) {
                 statement.setString(1, course.getName());
                 statement.setString(2, course.getDescription());
@@ -53,8 +63,6 @@ public class CourseDao {
             }
 
             statement.executeBatch();
-
-            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -66,10 +74,10 @@ public class CourseDao {
 
         try (Connection connection = factory.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL);) {
+             ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
             EntityMapper mapper = new EntityMapper();
             while (resultSet.next()) {
-                courses.add(mapper.map(resultSet, Course.class));
+                courses = mapper.mapCourses(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -82,13 +90,13 @@ public class CourseDao {
         Course course = null;
 
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_NAME);) {
+             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_NAME)) {
             statement.setString(1, name);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 EntityMapper mapper = new EntityMapper();
                 if (resultSet.next()) {
-                    course = mapper.map(resultSet, Course.class);
+                    course = mapper.mapCourse(resultSet);
                 }
             }
         } catch (SQLException e) {
@@ -102,13 +110,12 @@ public class CourseDao {
         List<Course> courses = new ArrayList<>();
 
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_STUDENT_ID);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_STUDENT_ID)) {
             statement.setInt(1, studentId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    courses.add(mapper.map(resultSet, Course.class));
+                    courses.add(mapper.mapCourse(resultSet));
                 }
             }
 
@@ -118,6 +125,4 @@ public class CourseDao {
 
         return courses;
     }
-
-
 }

@@ -100,7 +100,7 @@ public class DatabaseSetupManager {
         Random random = new Random();
 
         for (int i = 1; i < 11; i++) {
-            int numberStudents = random.nextInt(0, 30);
+            int numberStudents = random.nextInt(0, 50);
             List<Integer> students = new ArrayList<>(numberStudents);
 
             for (int j = 0; j < numberStudents; j++) {

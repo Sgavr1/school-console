@@ -1,24 +1,21 @@
 package org.example.entity;
 
-import org.example.map.Column;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
-    @Column(name = "course_id")
     private int id;
-    @Column(name = "course_name")
     private String name;
-    @Column(name = "course_description")
     private String description;
     private List<Student> students;
 
     public Course() {
-
+        students = new ArrayList<>();
     }
 
     public Course(int id) {
         this.id = id;
+        students = new ArrayList<>();
     }
 
     public int getId() {

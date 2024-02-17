@@ -12,7 +12,7 @@ public class ServiceFactory {
     }
 
     public CourseService getCourseService() {
-        return new CourseService(daoFactory.getCourseDao(), daoFactory.getStudentDao());
+        return new CourseService(daoFactory.getCourseDao());
     }
 
     public GroupService getGroupService() {
@@ -20,6 +20,6 @@ public class ServiceFactory {
     }
 
     public StudentService getStudentService() {
-        return new StudentService(daoFactory.getStudentDao(), daoFactory.getCourseDao());
+        return new StudentService(daoFactory.getStudentDao());
     }
 }

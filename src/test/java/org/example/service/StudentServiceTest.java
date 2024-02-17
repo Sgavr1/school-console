@@ -1,9 +1,6 @@
 package org.example.service;
 
-import org.checkerframework.framework.qual.DefaultQualifier;
-import org.example.dao.CourseDao;
 import org.example.dao.StudentDao;
-import org.example.entity.Course;
 import org.example.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,15 +19,13 @@ public class StudentServiceTest {
     private final static String STUDENT_2_FIRST_NAME = "Артем";
     private final static String STUDENT_2_LAST_NAME = "Литвиненко";
     private final static String COURSE_NAME = "Вступ до програмування";
-    private CourseDao courseDao;
     private StudentDao studentDao;
     private StudentService studentService;
 
     @BeforeEach
     public void init() {
-        courseDao = Mockito.mock(CourseDao.class);
         studentDao = Mockito.mock(StudentDao.class);
-        studentService = new StudentService(studentDao, courseDao);
+        studentService = new StudentService(studentDao);
     }
 
     @Test
@@ -55,12 +50,6 @@ public class StudentServiceTest {
 
     @Test
     public void shouldGetByCourseName() {
-        Course course = new Course();
-        course.setId(1);
-        course.setName(COURSE_NAME);
-
-        Mockito.when(courseDao.getByName(COURSE_NAME)).thenReturn(Optional.of(course));
-
         List<Student> students = new ArrayList<>();
 
         Student student1 = new Student(1);
@@ -77,20 +66,18 @@ public class StudentServiceTest {
 
         students.add(student2);
 
-        Mockito.when(studentDao.getStudentsByCourseId(1)).thenReturn(students);
+        Mockito.when(studentDao.getStudentsByCourseName(COURSE_NAME)).thenReturn(students);
 
         List<Student> responses = studentService.getStudentsByCourseName(COURSE_NAME);
 
-        verify(courseDao).getByName(COURSE_NAME);
-        verify(studentDao).getStudentsByCourseId(1);
-        verify(studentDao).getStudentsByCourseId(1);
+        verify(studentDao).getStudentsByCourseName(COURSE_NAME);
 
         assertEquals(responses.contains(student1), true);
         assertEquals(responses.contains(student2), true);
     }
 
     @Test
-    public void verifyStudentAddedToDatabase() {
+    public void shouldAddStudent() {
         Student student = new Student();
 
         studentService.addStudent(student);
@@ -99,7 +86,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void verifyStudentsAddedToDatabase() {
+    public void shouldAddStudents() {
         List<Student> students = new ArrayList<>();
 
         studentService.addStudents(students);
@@ -108,14 +95,14 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void verifyAddedStudentOnCourseToDatabase() {
+    public void shouldAddStudentOnCourse() {
         studentService.addStudentToCourse(1, 1);
 
         verify(studentDao).insertStudentToCourse(1, 1);
     }
 
     @Test
-    public void verifyAddedStudentsOnCourseToDatabase() {
+    public void shouldAddStudentsOnCourse() {
         List<Student> students = new ArrayList<>();
 
         studentService.addStudentsOnCourse(1, students);
@@ -124,12 +111,11 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void verifyDeletedStudentToDatabase() {
+    public void shouldDeletedStudent() {
         Student student = new Student(1);
 
         studentService.delete(student);
 
-        verify(studentDao).deleteFromAllCoursesByStudentId(1);
         verify(studentDao).delete(1);
     }
 
@@ -161,11 +147,6 @@ public class StudentServiceTest {
 
     @Test
     public void testListStudentsByName() {
-        Course course = new Course(1);
-        course.setName(COURSE_NAME);
-
-        Mockito.when(courseDao.getByName(COURSE_NAME)).thenReturn(Optional.of(course));
-
         List<Student> students = new ArrayList<>();
         Student student1 = new Student(1);
         student1.setGroupId(4);
@@ -179,12 +160,11 @@ public class StudentServiceTest {
         student2.setLastName(STUDENT_2_LAST_NAME);
         students.add(student2);
 
-        Mockito.when(studentDao.getStudentsByCourseId(1)).thenReturn(students);
+        Mockito.when(studentDao.getStudentsByCourseName(COURSE_NAME)).thenReturn(students);
 
         List<Student> response = studentService.getStudentsByCourseName(COURSE_NAME);
 
-        verify(courseDao).getByName(COURSE_NAME);
-        verify(studentDao).getStudentsByCourseId(1);
+        verify(studentDao).getStudentsByCourseName(COURSE_NAME);
 
         assertEquals(students.contains(response.get(0)), true);
         assertEquals(students.contains(response.get(1)), true);

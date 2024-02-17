@@ -1,21 +1,20 @@
 package org.example.entity;
 
-import org.example.map.Column;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
-    @Column(name = "group_id")
     private int id;
-    @Column(name = "group_name")
     private String name;
     private List<Student> students;
 
     public Group() {
-
+        students = new ArrayList<>();
     }
 
     public Group(String name) {
         this.name = name;
+        students = new ArrayList<>();
     }
 
     public int getId() {

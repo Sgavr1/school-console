@@ -12,13 +12,36 @@ import java.util.Optional;
 public class StudentDao {
     private final static String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
     private final static String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?)";
-    private final static String QUERY_SELECT_BY_ID = "SELECT * FROM students WHERE student_id = ?;";
-    private final static String QUERY_SELECT_ALL = "SELECT * FROM students;";
-    private final static String QUERY_SELECT_ALL_BY_COURSE_ID = """
-            Select students.student_id, first_name, last_name, group_id
+    private final static String QUERY_SELECT_BY_ID = """
+            SELECT students.*, courses.*
             FROM students
-            JOIN student_course ON student_course.student_id = students.student_id
-            WHERE course_id = ?;
+            LEFT JOIN student_course ON student_course.student_id = students.student_id
+            LEFT JOIN courses ON courses.course_id = student_course.course_id
+            WHERE students.student_id = ?;
+            """;
+    private final static String QUERY_SELECT_ALL = """
+            SELECT students.*, courses.*
+            FROM students
+            LEFT JOIN student_course ON student_course.student_id = students.student_id
+            LEFT JOIN courses ON courses.course_id = student_course.course_id;
+            """;
+    private final static String QUERY_SELECT_ALL_BY_COURSE_ID = """
+            SELECT students.*, c.*
+            FROM courses
+            LEFT JOIN student_course ON student_course.course_id = courses.course_id
+            LEFT JOIN students ON students.student_id = student_course.student_id
+            LEFT JOIN student_course as sc ON sc.student_id = students.student_id
+            LEFT JOIN courses as c ON c.course_id = sc.course_id
+            WHERE courses.course_id = ?;
+            """;
+    private final static String QUERY_SELECT_ALL_BY_COURSE_NAME = """
+            SELECT students.*, c.*
+            FROM courses
+            LEFT JOIN student_course ON student_course.course_id = courses.course_id
+            LEFT JOIN students ON students.student_id = student_course.student_id
+            LEFT JOIN student_course as sc ON sc.student_id = students.student_id
+            LEFT JOIN courses as c ON c.course_id = sc.course_id
+            WHERE courses.course_name = ?;
             """;
     private final static String QUERY_DELETE_BY_ID = "DELETE FROM students WHERE student_id = ?;";
     private final static String QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID = """
@@ -40,8 +63,7 @@ public class StudentDao {
     public void insert(Student student) {
 
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT)) {
             statement.setString(1, student.getFirstName());
             statement.setString(2, student.getLastName());
             statement.setInt(3, student.getGroupId());
@@ -55,10 +77,7 @@ public class StudentDao {
 
     public void insertList(List<Student> students) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT);) {
-
-            connection.setAutoCommit(false);
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT)) {
             for (Student student : students) {
                 statement.setString(1, student.getFirstName());
                 statement.setString(2, student.getLastName());
@@ -69,8 +88,6 @@ public class StudentDao {
 
             statement.executeBatch();
 
-            connection.commit();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -80,13 +97,12 @@ public class StudentDao {
         Student student = null;
 
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_ID);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_ID)) {
             statement.setInt(1, id);
 
-            try (ResultSet resultSet = statement.executeQuery();) {
+            try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    student = mapper.map(resultSet, Student.class);
+                    student = mapper.mapStudent(resultSet);
                 }
             }
 
@@ -99,11 +115,17 @@ public class StudentDao {
 
     public void delete(int id) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_DELETE_BY_ID);) {
+             PreparedStatement statementDeleteAllCourse = connection.prepareStatement(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID);
+             PreparedStatement statementDelete = connection.prepareStatement(QUERY_DELETE_BY_ID)) {
+            connection.setAutoCommit(false);
 
-            statement.setInt(1, id);
+            statementDeleteAllCourse.setInt(1, id);
+            statementDelete.setInt(1, id);
 
-            statement.executeUpdate();
+            statementDeleteAllCourse.executeUpdate();
+            statementDelete.executeUpdate();
+
+            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,8 +134,7 @@ public class StudentDao {
 
     public void deleteFromAllCoursesByStudentId(int id) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID)) {
             statement.setInt(1, id);
 
             statement.executeUpdate();
@@ -125,8 +146,7 @@ public class StudentDao {
 
     public void deleteFromCourse(int studentId, int courseId) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_DELETE_FROM_COURSE);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_DELETE_FROM_COURSE)) {
             statement.setInt(1, studentId);
             statement.setInt(2, courseId);
 
@@ -142,11 +162,8 @@ public class StudentDao {
 
         try (Connection connection = factory.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL);) {
-
-            while (resultSet.next()) {
-                students.add(mapper.map(resultSet, Student.class));
-            }
+             ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
+            students = mapper.mapStudents(resultSet);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -155,17 +172,14 @@ public class StudentDao {
         return students;
     }
 
-    public List<Student> getStudentsByCourseId(int courseId) {
+    public List<Student> getStudentsByCourseName(String courseName) {
         List<Student> students = new ArrayList<>();
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_COURSE_ID);) {
-
-            statement.setInt(1, courseId);
+             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_COURSE_ID)) {
+            statement.setString(1, courseName);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    students.add(mapper.map(resultSet, Student.class));
-                }
+                students = mapper.mapStudents(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -176,8 +190,7 @@ public class StudentDao {
 
     public void insertStudentToCourse(int studentId, int courseId) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT_STUDENT_COURSE);) {
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT_STUDENT_COURSE)) {
             statement.setInt(1, studentId);
             statement.setInt(2, courseId);
 
@@ -190,10 +203,7 @@ public class StudentDao {
 
     public void insertListStudentsOnCourse(int courseId, List<Student> students) {
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT_STUDENT_COURSE);) {
-
-            connection.setAutoCommit(false);
-
+             PreparedStatement statement = connection.prepareStatement(QUERY_INSERT_STUDENT_COURSE)) {
             statement.setInt(2, courseId);
 
             for (Student student : students) {
@@ -204,8 +214,6 @@ public class StudentDao {
             }
 
             statement.executeBatch();
-
-            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();

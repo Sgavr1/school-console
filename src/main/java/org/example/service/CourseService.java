@@ -8,11 +8,9 @@ import java.util.List;
 
 public class CourseService {
     private CourseDao courseDao;
-    private StudentDao studentDao;
 
-    public CourseService(CourseDao courseDao, StudentDao studentDao) {
+    public CourseService(CourseDao courseDao) {
         this.courseDao = courseDao;
-        this.studentDao = studentDao;
     }
 
     public void addCourse(Course course) {
@@ -28,11 +26,6 @@ public class CourseService {
     }
 
     public List<Course> getAllCourses() {
-        List<Course> courses = courseDao.getAll();
-        for (Course course : courses) {
-            course.setStudents(studentDao.getStudentsByCourseId(course.getId()));
-        }
-
-        return courses;
+        return courseDao.getAll();
     }
 }

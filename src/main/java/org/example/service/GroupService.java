@@ -12,8 +12,8 @@ public class GroupService {
         this.groupDao = groupDao;
     }
 
-        public List<Group> getGroupsGreaterOrEqualsStudents(int amountStudents) {
-        return groupDao.getGroupGreaterOrEqualsStudents(amountStudents);
+    public List<Group> getGroupsGreaterOrEqualsStudents(int studentsAmount) {
+        return groupDao.getGroupGreaterOrEqualsStudents(studentsAmount);
     }
 
     public void addGroup(Group group) {

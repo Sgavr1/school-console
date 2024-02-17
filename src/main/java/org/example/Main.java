@@ -13,7 +13,7 @@ public class Main {
         ServiceFactory serviceFactory = new ServiceFactory(daoFactory);
 
         ConsoleApplication consoleApplication = new ConsoleApplication(serviceFactory, connectionFactory);
-        consoleApplication.databaseInitialization();
+        consoleApplication.setupDatabase();
         consoleApplication.start();
     }
 }

@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.checkerframework.framework.qual.DefaultQualifier;
 import org.example.dao.GroupDao;
 import org.example.entity.Group;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +43,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void getListGroupWhenNumbersStudentLargeOrEqualsNumber() {
+    public void getListGroupWhenNumbersStudentGreaterOrEqualsNumber() {
         List<Group> groups = new ArrayList<>();
         Group group = new Group();
         group.setId(1);
@@ -72,7 +71,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void verifyGroupAddedToDatabase() {
+    public void shouldAddGroup() {
         Group group = new Group(GROUP_NAME_1);
         group.setId(1);
 
@@ -83,7 +82,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void verifyGroupsAddedToDatabase() {
+    public void shouldAddGroups() {
         List<Group> groups = new ArrayList<>();
 
         groupService.addGroups(groups);

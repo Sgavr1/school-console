@@ -1,8 +1,6 @@
 package org.example.service;
 
-import org.checkerframework.framework.qual.DefaultQualifier;
 import org.example.dao.CourseDao;
-import org.example.dao.StudentDao;
 import org.example.entity.Course;
 import org.example.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +24,12 @@ public class CourseServiceTest {
     private final static String STUDENT_2_LAST_NAME = "Григоренко";
 
     private CourseDao courseDao;
-    private StudentDao studentDao;
     private CourseService courseService;
 
     @BeforeEach
     public void init() {
         courseDao = Mockito.mock(CourseDao.class);
-        studentDao = Mockito.mock(StudentDao.class);
-        courseService = new CourseService(courseDao, studentDao);
+        courseService = new CourseService(courseDao);
     }
 
     @Test
@@ -53,7 +49,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void verifyCourseAddedToDatabase() {
+    public void shouldAddCourse() {
         Course course = new Course();
 
         courseService.addCourse(course);
@@ -62,7 +58,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void verifyCoursesAddedToDatabase() {
+    public void shouldAddCourses() {
         List<Course> courses = new ArrayList<>();
 
         courseService.addCourses(courses);
@@ -79,23 +75,19 @@ public class CourseServiceTest {
         course.setDescription(COURSE_DESCRIPTION);
         courses.add(course);
 
-        List<Student> students = new ArrayList<>();
-
         Student student = new Student(1);
         student.setGroupId(1);
         student.setFirstName(STUDENT_1_FIRST_NAME);
         student.setLastName(STUDENT_1_LAST_NAME);
 
-        students.add(student);
+        course.getStudents().add(student);
 
         student = new Student(2);
         student.setGroupId(3);
         student.setFirstName(STUDENT_2_FIRST_NAME);
         student.setLastName(STUDENT_2_LAST_NAME);
 
-        students.add(student);
-
-        Mockito.when(studentDao.getStudentsByCourseId(1)).thenReturn(students);
+        course.getStudents().add(student);
 
         Mockito.when(courseDao.getAll()).thenReturn(courses);
 
@@ -106,7 +98,6 @@ public class CourseServiceTest {
         Student responseStudent2 = responseCourse.getStudents().get(1);
 
         verify(courseDao).getAll();
-        verify(studentDao).getStudentsByCourseId(1);
 
         assertEquals(COURSE_NAME, responseCourse.getName());
         assertEquals(COURSE_DESCRIPTION, responseCourse.getDescription());
