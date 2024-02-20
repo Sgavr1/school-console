@@ -1,10 +1,8 @@
 package org.example.dao;
 
-import org.example.entity.Student;
 import org.example.factory.ConnectionFactory;
 import org.example.entity.Course;
 import org.example.map.CourseMapper;
-import org.example.map.StudentMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,12 +33,10 @@ public class CourseDao {
             """;
     private ConnectionFactory factory;
     private CourseMapper courseMapper;
-    private StudentMapper studentMapper;
 
-    public CourseDao(ConnectionFactory factory, CourseMapper courseMapper, StudentMapper studentMapper) {
+    public CourseDao(ConnectionFactory factory, CourseMapper courseMapper) {
         this.factory = factory;
         this.courseMapper = courseMapper;
-        this.studentMapper = studentMapper;
     }
 
     public void insert(Course course) {
@@ -80,18 +76,7 @@ public class CourseDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
 
-            while (resultSet.next()) {
-                Course mapCourse = courseMapper.map(resultSet);
-                Course course = courses.stream().filter(c -> c.getId() == mapCourse.getId()).findFirst().orElseGet(() -> {
-                    courses.add(mapCourse);
-                    return mapCourse;
-                });
-
-                Student student = studentMapper.map(resultSet);
-                if (student != null) {
-                    course.getStudents().add(student);
-                }
-            }
+            courses = courseMapper.mapCourses(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -108,9 +93,6 @@ public class CourseDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 course = courseMapper.map(resultSet);
-                do {
-                    course.getStudents().add(studentMapper.map(resultSet));
-                } while (resultSet.next());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -127,18 +109,7 @@ public class CourseDao {
             statement.setInt(1, studentId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Course mapCourse = courseMapper.map(resultSet);
-                    Course course = courses.stream().filter(c -> c.getId() == mapCourse.getId()).findFirst().orElseGet(() -> {
-                        courses.add(mapCourse);
-                        return mapCourse;
-                    });
-
-                    Student student = studentMapper.map(resultSet);
-                    if (student != null) {
-                        course.getStudents().add(student);
-                    }
-                }
+                courses = courseMapper.mapCourses(resultSet);
             }
 
         } catch (SQLException e) {

@@ -1,10 +1,8 @@
 package org.example.dao;
 
-import org.example.entity.Student;
 import org.example.factory.ConnectionFactory;
 import org.example.entity.Group;
 import org.example.map.GroupMapper;
-import org.example.map.StudentMapper;
 
 import java.util.Optional;
 import java.sql.*;
@@ -34,12 +32,10 @@ public class GroupDao {
             """;
     private ConnectionFactory factory;
     private GroupMapper groupMapper;
-    private StudentMapper studentMapper;
 
-    public GroupDao(ConnectionFactory factory, GroupMapper groupMapper, StudentMapper studentMapper) {
+    public GroupDao(ConnectionFactory factory, GroupMapper groupMapper) {
         this.factory = factory;
         this.groupMapper = groupMapper;
-        this.studentMapper = studentMapper;
     }
 
     public List<Group> getGroupGreaterOrEqualsStudents(int studentsAmount) {
@@ -50,18 +46,7 @@ public class GroupDao {
             statement.setInt(1, studentsAmount);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Group mapGroup = groupMapper.map(resultSet);
-                    Group group = groups.stream().filter(g -> g.getId() == mapGroup.getId()).findFirst().orElseGet(() -> {
-                        groups.add(mapGroup);
-                        return mapGroup;
-                    });
-
-                    Student student = studentMapper.map(resultSet);
-                    if (student != null) {
-                        group.getStudents().add(student);
-                    }
-                }
+                groups = groupMapper.mapGroups(resultSet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,19 +89,8 @@ public class GroupDao {
         try (Connection connection = factory.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
-            while (resultSet.next()) {
-                Group mapGroup = groupMapper.map(resultSet);
-                Group group = groups.stream().filter(g -> g.getId() == mapGroup.getId()).findFirst().orElseGet(() -> {
-                    groups.add(mapGroup);
-                    return mapGroup;
-                });
 
-                Student student = studentMapper.map(resultSet);
-                if (student != null) {
-                    group.getStudents().add(student);
-                }
-            }
-
+            groups = groupMapper.mapGroups(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -125,7 +99,6 @@ public class GroupDao {
     }
 
     public Optional<Group> getGroupByName(String name) {
-
         Group group = null;
 
         try (Connection connection = factory.getConnection();
@@ -133,12 +106,7 @@ public class GroupDao {
             statement.setString(1, name);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    group = groupMapper.map(resultSet);
-                    do {
-                        group.getStudents().add(studentMapper.map(resultSet));
-                    } while (resultSet.next());
-                }
+                group = groupMapper.map(resultSet);
             }
 
         } catch (SQLException e) {

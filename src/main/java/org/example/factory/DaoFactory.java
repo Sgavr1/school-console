@@ -18,6 +18,10 @@ public class DaoFactory {
         this.studentMapper = studentMapper;
         this.courseMapper = courseMapper;
         this.groupMapper = groupMapper;
+
+        studentMapper.setCourseMapper(courseMapper);
+        courseMapper.setStudentMapper(studentMapper);
+        groupMapper.setStudentMapper(studentMapper);
     }
 
     public DaoFactory(ConnectionFactory connectionFactory) {
@@ -28,14 +32,14 @@ public class DaoFactory {
     }
 
     public StudentDao getStudentDao() {
-        return new StudentDao(connectionFactory, studentMapper, courseMapper);
+        return new StudentDao(connectionFactory, studentMapper);
     }
 
     public GroupDao getGroupDao() {
-        return new GroupDao(connectionFactory, groupMapper, studentMapper);
+        return new GroupDao(connectionFactory, groupMapper);
     }
 
     public CourseDao getCourseDao() {
-        return new CourseDao(connectionFactory, courseMapper, studentMapper);
+        return new CourseDao(connectionFactory, courseMapper);
     }
 }
