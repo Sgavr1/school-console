@@ -1,6 +1,6 @@
 package org.example.command;
 
 public interface Command {
-    String commandName();
+    String commandLabel();
     void start();
 }

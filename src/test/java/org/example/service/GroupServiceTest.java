@@ -2,8 +2,9 @@ package org.example.service;
 
 import org.example.dao.GroupDao;
 import org.example.entity.Group;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -13,14 +14,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GroupServiceTest {
 
-    private final static String GROUP_NAME_1 = "AB-01";
-    private final static String GROUP_NAME_2 = "SA-02";
+    private static final String GROUP_NAME_1 = "AB-01";
+    private static final String GROUP_NAME_2 = "SA-02";
     private GroupDao groupDao;
     private GroupService groupService;
 
-    @BeforeEach
+    @BeforeAll
     public void init() {
         groupDao = Mockito.mock(GroupDao.class);
         groupService = new GroupService(groupDao);

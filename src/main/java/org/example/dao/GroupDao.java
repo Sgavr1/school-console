@@ -1,8 +1,10 @@
 package org.example.dao;
 
+import org.example.entity.Student;
 import org.example.factory.ConnectionFactory;
 import org.example.entity.Group;
-import org.example.map.EntityMapper;
+import org.example.map.GroupMapper;
+import org.example.map.StudentMapper;
 
 import java.util.Optional;
 import java.sql.*;
@@ -10,19 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupDao {
-    private final static String QUERY_INSERT = "INSERT INTO groups(group_name) VALUES(?);";
-    private final static String QUERY_SELECT_ALL = """
+    private static final String QUERY_INSERT = "INSERT INTO groups(group_name) VALUES(?);";
+    private static final String QUERY_SELECT_ALL = """
             SELECT groups.*, students.*
             FROM groups
             LEFT JOIN students ON students.group_id = groups.group_id;
             """;
-    private final static String QUERY_SELECT_BY_NAME = """
+    private static final String QUERY_SELECT_BY_NAME = """
             SELECT groups.*, students.*
             FROM groups
             LEFT JOIN students ON students.group_id = groups.group_id
             WHERE groups.group_name = 'SQ-06';
             """;
-    private final static String QUERY_SELECT_LARGE_OR_EQUALS_STUDENT = """
+    private static final String QUERY_SELECT_LARGE_OR_EQUALS_STUDENT = """
             SELECT groups.*, s.*
             FROM groups
             LEFT JOIN students ON students.group_id = groups.group_id
@@ -31,11 +33,13 @@ public class GroupDao {
             HAVING count(students.student_id) >= ?;
             """;
     private ConnectionFactory factory;
-    private EntityMapper mapper;
+    private GroupMapper groupMapper;
+    private StudentMapper studentMapper;
 
-    public GroupDao(ConnectionFactory factory, EntityMapper mapper) {
+    public GroupDao(ConnectionFactory factory, GroupMapper groupMapper, StudentMapper studentMapper) {
         this.factory = factory;
-        this.mapper = mapper;
+        this.groupMapper = groupMapper;
+        this.studentMapper = studentMapper;
     }
 
     public List<Group> getGroupGreaterOrEqualsStudents(int studentsAmount) {
@@ -47,7 +51,16 @@ public class GroupDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    groups = mapper.mapGroups(resultSet);
+                    Group mapGroup = groupMapper.map(resultSet);
+                    Group group = groups.stream().filter(g -> g.getId() == mapGroup.getId()).findFirst().orElseGet(() -> {
+                        groups.add(mapGroup);
+                        return mapGroup;
+                    });
+
+                    Student student = studentMapper.map(resultSet);
+                    if (student != null) {
+                        group.getStudents().add(student);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -92,7 +105,16 @@ public class GroupDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
             while (resultSet.next()) {
-                groups = mapper.mapGroups(resultSet);
+                Group mapGroup = groupMapper.map(resultSet);
+                Group group = groups.stream().filter(g -> g.getId() == mapGroup.getId()).findFirst().orElseGet(() -> {
+                    groups.add(mapGroup);
+                    return mapGroup;
+                });
+
+                Student student = studentMapper.map(resultSet);
+                if (student != null) {
+                    group.getStudents().add(student);
+                }
             }
 
         } catch (SQLException e) {
@@ -112,7 +134,10 @@ public class GroupDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    group = mapper.mapGroup(resultSet);
+                    group = groupMapper.map(resultSet);
+                    do {
+                        group.getStudents().add(studentMapper.map(resultSet));
+                    } while (resultSet.next());
                 }
             }
 

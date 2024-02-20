@@ -6,11 +6,11 @@ import org.example.service.StudentService;
 import java.util.Scanner;
 
 public class RemoveStudentCourseCommand implements Command {
-    private final static String COMMAND_NAME = "Remove the student from one of their courses";
-    private final static String STRING_COURSE_NAME = "Course Name: ";
-    private final static String STRING_DESCRIPTION = "Description: ";
-    private final static String STRING_CHOOSE_COURSE = "Choose course: ";
-    private final static String STRING_WRITE_STUDENT_ID = "Write student id: ";
+    private static final String COMMAND_LABEL = "Remove the student from one of their courses";
+    private static final String COURSE_NAME = "Course Name: ";
+    private static final String DESCRIPTION = "Description: ";
+    private static final String CHOOSE_COURSE = "Choose course: ";
+    private static final String WRITE_STUDENT_ID = "Write student id: ";
     private Scanner scanner;
     private StudentService studentService;
     private CourseService courseService;
@@ -22,8 +22,8 @@ public class RemoveStudentCourseCommand implements Command {
     }
 
     @Override
-    public String commandName() {
-        return COMMAND_NAME;
+    public String commandLabel() {
+        return COMMAND_LABEL;
     }
 
     @Override
@@ -31,11 +31,11 @@ public class RemoveStudentCourseCommand implements Command {
         scanner.nextLine();
 
         courseService.getAllCourses().stream().forEach(course ->
-                System.out.println(STRING_COURSE_NAME + course.getName() + "\n" + STRING_DESCRIPTION + course.getDescription() + "\n"));
+                System.out.println(COURSE_NAME + course.getName() + "\n" + DESCRIPTION + course.getDescription() + "\n"));
 
-        System.out.print(STRING_CHOOSE_COURSE);
+        System.out.print(CHOOSE_COURSE);
         int courseId = courseService.getCourseByName(scanner.nextLine()).getId();
-        System.out.print(STRING_WRITE_STUDENT_ID);
+        System.out.print(WRITE_STUDENT_ID);
         int studentId = scanner.nextInt();
 
         studentService.addStudentToCourse(courseId, studentId);

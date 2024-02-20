@@ -6,11 +6,11 @@ import org.example.service.StudentService;
 import java.util.Scanner;
 
 public class AddStudentCourseCommand implements Command {
-    private final static String COMMAND_NAME = "Add a student to the course";
-    private final static String STRING_COURSE_NAME = "Course Name: ";
-    private final static String STRING_DESCRIPTION = "Description: ";
-    private final static String STRING_CHOOSE_COURSE = "Choose course: ";
-    private final static String STRING_WRITE_STUDENT_ID = "Write student id: ";
+    private static final String COMMAND_LABEL = "Add a student to the course";
+    private static final String COURSE_NAME = "Course Name: ";
+    private static final String DESCRIPTION = "Description: ";
+    private static final String CHOOSE_COURSE = "Choose course: ";
+    private static final String WRITE_STUDENT_ID = "Write student id: ";
     private Scanner scanner;
     private StudentService studentService;
     private CourseService courseService;
@@ -22,8 +22,8 @@ public class AddStudentCourseCommand implements Command {
     }
 
     @Override
-    public String commandName() {
-        return COMMAND_NAME;
+    public String commandLabel() {
+        return COMMAND_LABEL;
     }
 
     @Override
@@ -31,11 +31,11 @@ public class AddStudentCourseCommand implements Command {
         scanner.nextLine();
 
         courseService.getAllCourses().stream().forEach(course ->
-                System.out.println(STRING_COURSE_NAME + course.getName() + "\n" + STRING_DESCRIPTION + course.getDescription() + "\n"));
+                System.out.println(COURSE_NAME + course.getName() + "\n" + DESCRIPTION + course.getDescription() + "\n"));
 
-        System.out.println(STRING_CHOOSE_COURSE);
+        System.out.println(CHOOSE_COURSE);
         int courseId = courseService.getCourseByName(scanner.nextLine()).getId();
-        System.out.println(STRING_WRITE_STUDENT_ID);
+        System.out.println(WRITE_STUDENT_ID);
         int studentId = scanner.nextInt();
 
         studentService.addStudentToCourse(studentId, courseId);

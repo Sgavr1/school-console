@@ -1,8 +1,10 @@
 package org.example.dao;
 
+import org.example.entity.Course;
 import org.example.factory.ConnectionFactory;
 import org.example.entity.Student;
-import org.example.map.EntityMapper;
+import org.example.map.CourseMapper;
+import org.example.map.StudentMapper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,31 +12,22 @@ import java.util.List;
 import java.util.Optional;
 
 public class StudentDao {
-    private final static String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
-    private final static String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?)";
-    private final static String QUERY_SELECT_BY_ID = """
+    private static final String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
+    private static final String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?)";
+    private static final String QUERY_SELECT_BY_ID = """
             SELECT students.*, courses.*
             FROM students
             LEFT JOIN student_course ON student_course.student_id = students.student_id
             LEFT JOIN courses ON courses.course_id = student_course.course_id
             WHERE students.student_id = ?;
             """;
-    private final static String QUERY_SELECT_ALL = """
+    private static final String QUERY_SELECT_ALL = """
             SELECT students.*, courses.*
             FROM students
             LEFT JOIN student_course ON student_course.student_id = students.student_id
             LEFT JOIN courses ON courses.course_id = student_course.course_id;
             """;
-    private final static String QUERY_SELECT_ALL_BY_COURSE_ID = """
-            SELECT students.*, c.*
-            FROM courses
-            LEFT JOIN student_course ON student_course.course_id = courses.course_id
-            LEFT JOIN students ON students.student_id = student_course.student_id
-            LEFT JOIN student_course as sc ON sc.student_id = students.student_id
-            LEFT JOIN courses as c ON c.course_id = sc.course_id
-            WHERE courses.course_id = ?;
-            """;
-    private final static String QUERY_SELECT_ALL_BY_COURSE_NAME = """
+    private static final String QUERY_SELECT_ALL_BY_COURSE_NAME = """
             SELECT students.*, c.*
             FROM courses
             LEFT JOIN student_course ON student_course.course_id = courses.course_id
@@ -43,21 +36,23 @@ public class StudentDao {
             LEFT JOIN courses as c ON c.course_id = sc.course_id
             WHERE courses.course_name = ?;
             """;
-    private final static String QUERY_DELETE_BY_ID = "DELETE FROM students WHERE student_id = ?;";
-    private final static String QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID = """
+    private static final String QUERY_DELETE_BY_ID = "DELETE FROM students WHERE student_id = ?;";
+    private static final String QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID = """
             DELETE FROM student_course
             WHERE student_id = ?;
             """;
-    private final static String QUERY_DELETE_FROM_COURSE = """
+    private static final String QUERY_DELETE_FROM_COURSE = """
             DELETE FROM student_course
             WHERE student_id = ? AND course_id = ?;
             """;
     private ConnectionFactory factory;
-    private EntityMapper mapper;
+    private StudentMapper studentMapper;
+    private CourseMapper courseMapper;
 
-    public StudentDao(ConnectionFactory factory, EntityMapper mapper) {
+    public StudentDao(ConnectionFactory factory, StudentMapper studentMapper, CourseMapper courseMapper) {
         this.factory = factory;
-        this.mapper = mapper;
+        this.studentMapper = studentMapper;
+        this.courseMapper = courseMapper;
     }
 
     public void insert(Student student) {
@@ -102,7 +97,10 @@ public class StudentDao {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    student = mapper.mapStudent(resultSet);
+                    student = studentMapper.map(resultSet);
+                    do {
+                        student.getCourses().add(courseMapper.map(resultSet));
+                    } while (resultSet.next());
                 }
             }
 
@@ -163,7 +161,18 @@ public class StudentDao {
         try (Connection connection = factory.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(QUERY_SELECT_ALL)) {
-            students = mapper.mapStudents(resultSet);
+            while (resultSet.next()) {
+                Student mapStudent = studentMapper.map(resultSet);
+                Student student = students.stream().filter(s -> s.getId() == mapStudent.getId()).findFirst().orElseGet(() -> {
+                    students.add(mapStudent);
+                    return mapStudent;
+                });
+
+                Course course = courseMapper.map(resultSet);
+                if (course != null) {
+                    student.getCourses().add(course);
+                }
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -175,11 +184,22 @@ public class StudentDao {
     public List<Student> getStudentsByCourseName(String courseName) {
         List<Student> students = new ArrayList<>();
         try (Connection connection = factory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_COURSE_ID)) {
+             PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_ALL_BY_COURSE_NAME)) {
             statement.setString(1, courseName);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                students = mapper.mapStudents(resultSet);
+                while (resultSet.next()) {
+                    Student mapStudent = studentMapper.map(resultSet);
+                    Student student = students.stream().filter(s -> s.getId() == mapStudent.getId()).findFirst().orElseGet(() -> {
+                        students.add(mapStudent);
+                        return mapStudent;
+                    });
+
+                    Course course = courseMapper.map(resultSet);
+                    if (course != null) {
+                        student.getCourses().add(course);
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

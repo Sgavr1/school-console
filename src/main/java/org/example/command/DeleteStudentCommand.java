@@ -6,9 +6,9 @@ import org.example.service.StudentService;
 import java.util.Scanner;
 
 public class DeleteStudentCommand implements Command {
-    private final static String COMMAND_NAME = "Delete a student by the STUDENT_ID";
-    private final static String STRING_WRITE_STUDENT_ID = "Write student id: ";
-    private final static String STRING_ERROR = "Unfaithful ID";
+    private static final String COMMAND_LABEL = "Delete a student by the STUDENT_ID";
+    private static final String WRITE_STUDENT_ID = "Write student id: ";
+    private static final String ERROR = "Unfaithful ID";
     private Scanner scanner;
     private StudentService studentService;
 
@@ -18,8 +18,8 @@ public class DeleteStudentCommand implements Command {
     }
 
     @Override
-    public String commandName() {
-        return COMMAND_NAME;
+    public String commandLabel() {
+        return COMMAND_LABEL;
     }
 
     @Override
@@ -27,13 +27,13 @@ public class DeleteStudentCommand implements Command {
         Student student = new Student();
 
         do {
-            System.out.print(STRING_WRITE_STUDENT_ID);
+            System.out.print(WRITE_STUDENT_ID);
             student.setId(scanner.nextInt());
 
             student = studentService.getStudentById(student.getId());
 
             if (student == null) {
-                System.out.println(STRING_ERROR);
+                System.out.println(ERROR);
             }
 
         } while (student == null);

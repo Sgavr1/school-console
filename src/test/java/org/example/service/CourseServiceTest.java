@@ -3,8 +3,9 @@ package org.example.service;
 import org.example.dao.CourseDao;
 import org.example.entity.Course;
 import org.example.entity.Student;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -14,19 +15,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CourseServiceTest {
 
-    private final static String COURSE_NAME = "Вступ до програмування";
-    private final static String COURSE_DESCRIPTION = "Основи програмування для початківців.";
-    private final static String STUDENT_1_FIRST_NAME = "Людмила";
-    private final static String STUDENT_1_LAST_NAME = "Мельник";
-    private final static String STUDENT_2_FIRST_NAME = "Андрей";
-    private final static String STUDENT_2_LAST_NAME = "Григоренко";
+    private static final String COURSE_NAME = "Вступ до програмування";
+    private static final String COURSE_DESCRIPTION = "Основи програмування для початківців.";
+    private static final String STUDENT_1_FIRST_NAME = "Людмила";
+    private static final String STUDENT_1_LAST_NAME = "Мельник";
+    private static final String STUDENT_2_FIRST_NAME = "Андрей";
+    private static final String STUDENT_2_LAST_NAME = "Григоренко";
 
     private CourseDao courseDao;
     private CourseService courseService;
 
-    @BeforeEach
+    @BeforeAll
     public void init() {
         courseDao = Mockito.mock(CourseDao.class);
         courseService = new CourseService(courseDao);
