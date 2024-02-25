@@ -3,76 +3,29 @@ package org.example;
 import org.example.entity.Course;
 import org.example.entity.Group;
 import org.example.entity.Student;
-import org.example.factory.ConnectionFactory;
 import org.example.service.CourseService;
 import org.example.service.GroupService;
 import org.example.service.StudentService;
+import org.springframework.stereotype.Component;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+@Component
 public class DatabaseSetupManager {
-    private FileReader reader;
-    private ConnectionFactory factory;
-    private StudentService studentService;
-    private CourseService courseService;
-    private GroupService groupService;
+    private final FileReader reader;
+    private final StudentService studentService;
+    private final CourseService courseService;
+    private final GroupService groupService;
 
-    public DatabaseSetupManager(FileReader reader, ConnectionFactory factory, StudentService studentService, CourseService courseService, GroupService groupService) {
+    public DatabaseSetupManager(FileReader reader, StudentService studentService, CourseService courseService, GroupService groupService) {
         this.reader = reader;
-        this.factory = factory;
 
         this.studentService = studentService;
         this.courseService = courseService;
         this.groupService = groupService;
-    }
-
-    public void createTable() {
-        dropTables();
-
-        FileReader reader = new FileReader();
-        Statement statement = null;
-        try (Connection connection = factory.getConnection()) {
-            statement = connection.createStatement();
-
-            statement.execute(reader.read("src/main/resources/createTables.sql"));
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void dropTables() {
-        Statement statement = null;
-        try (Connection connection = factory.getConnection()) {
-            statement = connection.createStatement();
-            statement.execute("Drop Table If exists students Cascade");
-            statement.execute("Drop Table If exists courses Cascade");
-            statement.execute("Drop Table If exists groups Cascade");
-            statement.execute("Drop Table If exists student_course Cascade");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void insertRandomStudents() {

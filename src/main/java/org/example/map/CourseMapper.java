@@ -2,57 +2,34 @@ package org.example.map;
 
 import org.example.entity.Course;
 import org.example.entity.Student;
+import org.springframework.jdbc.core.RowMapper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CourseMapper {
-    public StudentMapper studentMapper;
+public class CourseMapper implements RowMapper<Course> {
+    public RowMapper<Student> studentMapper;
 
-    public void setStudentMapper(StudentMapper studentMapper) {
+    public void setStudentMapper(RowMapper<Student> studentMapper) {
         this.studentMapper = studentMapper;
     }
 
-    public Course map(ResultSet resultSet) throws SQLException {
-        Course course = null;
-        if (resultSet.next()) {
-            course = fill(resultSet);
-            do {
-                course.getStudents().add(studentMapper.fill(resultSet));
-            } while (resultSet.next());
+    @Override
+    public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Course course = new Course();
+        course.setName(rs.getString("course_name"));
+        if (rs.wasNull()) {
+            return null;
         }
+        course.setId(rs.getInt("course_id"));
+        course.setDescription(rs.getString("course_description"));
 
-        return course;
-    }
-
-    public List<Course> mapCourses(ResultSet resultSet) throws SQLException {
-        List<Course> courses = new ArrayList<>();
-        while (resultSet.next()) {
-            Course mapCourse = fill(resultSet);
-            Course course = courses.stream().filter(c -> c.getId() == mapCourse.getId()).findFirst().orElseGet(() -> {
-                courses.add(mapCourse);
-                return mapCourse;
-            });
-
-            Student student = studentMapper.fill(resultSet);
+        if (studentMapper != null) {
+            Student student = studentMapper.mapRow(rs, rowNum);
             if (student != null) {
                 course.getStudents().add(student);
             }
         }
-
-        return courses;
-    }
-
-    public Course fill(ResultSet resultSet) throws SQLException {
-        Course course = new Course();
-        course.setName(resultSet.getString("course_name"));
-        if (resultSet.wasNull()) {
-            return null;
-        }
-        course.setId(resultSet.getInt("course_id"));
-        course.setDescription(resultSet.getString("course_description"));
 
         return course;
     }

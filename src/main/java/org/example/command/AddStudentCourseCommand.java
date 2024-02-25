@@ -33,9 +33,9 @@ public class AddStudentCourseCommand implements Command {
         courseService.getAllCourses().stream().forEach(course ->
                 System.out.println(COURSE_NAME + course.getName() + "\n" + DESCRIPTION + course.getDescription() + "\n"));
 
-        System.out.println(CHOOSE_COURSE);
+        System.out.print(CHOOSE_COURSE);
         int courseId = courseService.getCourseByName(scanner.nextLine()).getId();
-        System.out.println(WRITE_STUDENT_ID);
+        System.out.print(WRITE_STUDENT_ID);
         int studentId = scanner.nextInt();
 
         studentService.addStudentToCourse(studentId, courseId);

@@ -1,17 +1,17 @@
 package org.example;
 
-import org.example.factory.ConnectionFactory;
-import org.example.factory.DaoFactory;
-import org.example.factory.ServiceFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
+@ComponentScan
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        DaoFactory daoFactory = new DaoFactory(connectionFactory);
-        ServiceFactory serviceFactory = new ServiceFactory(daoFactory);
-
-        ConsoleApplication consoleApplication = new ConsoleApplication(serviceFactory, connectionFactory);
-        consoleApplication.setupDatabase();
-        consoleApplication.start();
+        SpringApplication.run(Main.class, args);
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(Main.class);
+        applicationContext.getBean(ConsoleApplication.class).start();
     }
 }

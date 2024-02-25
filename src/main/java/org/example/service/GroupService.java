@@ -2,11 +2,13 @@ package org.example.service;
 
 import org.example.dao.GroupDao;
 import org.example.entity.Group;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class GroupService {
-    private GroupDao groupDao;
+    private final GroupDao groupDao;
 
     public GroupService(GroupDao groupDao) {
         this.groupDao = groupDao;

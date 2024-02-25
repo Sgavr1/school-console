@@ -38,6 +38,6 @@ public class RemoveStudentCourseCommand implements Command {
         System.out.print(WRITE_STUDENT_ID);
         int studentId = scanner.nextInt();
 
-        studentService.addStudentToCourse(courseId, studentId);
+        studentService.deleteFromCourse(studentId, courseId);
     }
 }

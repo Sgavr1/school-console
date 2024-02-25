@@ -1,13 +1,14 @@
 package org.example.service;
 
 import org.example.dao.CourseDao;
-import org.example.dao.StudentDao;
 import org.example.entity.Course;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class CourseService {
-    private CourseDao courseDao;
+    private final CourseDao courseDao;
 
     public CourseService(CourseDao courseDao) {
         this.courseDao = courseDao;

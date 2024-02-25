@@ -1,32 +1,28 @@
 package org.example;
 
 import org.example.command.*;
-import org.example.factory.ConnectionFactory;
-import org.example.factory.ServiceFactory;
 import org.example.service.CourseService;
 import org.example.service.GroupService;
 import org.example.service.StudentService;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+@Component
 public class ConsoleApplication {
     private static final String CHOOSE_COMMAND = "Choose a command: ";
     private static final String COMMAND_EXIT = "Exit";
+    private static final String BEGIN_MESSAGE = "Fill the database? (Be careful, if there is already data in the database, it is better to choose \"no\")";
+    private static final String COMMAND_YES = "1 - YES";
+    private static final String COMMAND_NO = "2 - NO";
     private Scanner scanner;
-    private DatabaseSetupManager databaseSetupManager;
-    private StudentService studentService;
-    private GroupService groupService;
-    private CourseService courseService;
+    private final DatabaseSetupManager databaseSetupManager;
     private Map<Integer, Command> commands;
 
-    public ConsoleApplication(ServiceFactory serviceFactory, ConnectionFactory connectionFactory) {
-        studentService = serviceFactory.getStudentService();
-        groupService = serviceFactory.getGroupService();
-        courseService = serviceFactory.getCourseService();
-
-        databaseSetupManager = new DatabaseSetupManager(new FileReader(), connectionFactory, studentService, courseService, groupService);
+    public ConsoleApplication(DatabaseSetupManager setupManager, StudentService studentService, GroupService groupService, CourseService courseService) {
+        this.databaseSetupManager = setupManager;
 
         scanner = new Scanner(System.in);
         commands = new HashMap<>();
@@ -40,9 +36,7 @@ public class ConsoleApplication {
         commands.put(7, new RemoveStudentCourseCommand(studentService, courseService, scanner));
     }
 
-    public void setupDatabase() {
-        databaseSetupManager.dropTables();
-        databaseSetupManager.createTable();
+    private void setupDatabase() {
         databaseSetupManager.insertGroup();
         databaseSetupManager.insertCourses();
         databaseSetupManager.insertRandomStudents();
@@ -50,6 +44,16 @@ public class ConsoleApplication {
     }
 
     public void start() {
+        System.out.println(BEGIN_MESSAGE);
+        System.out.println(COMMAND_YES);
+        System.out.println(COMMAND_NO);
+
+        int numberCommand = scanner.nextInt();
+
+        if (numberCommand == 1) {
+            setupDatabase();
+        }
+
         while (true) {
             for (Map.Entry<Integer, Command> command : commands.entrySet()) {
                 System.out.println(command.getKey() + ": " + command.getValue().commandLabel());
@@ -57,7 +61,7 @@ public class ConsoleApplication {
 
             System.out.println("0: " + COMMAND_EXIT);
             System.out.print(CHOOSE_COMMAND);
-            int numberCommand = scanner.nextInt();
+            numberCommand = scanner.nextInt();
 
             if (numberCommand == 0) {
                 break;

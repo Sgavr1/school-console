@@ -2,11 +2,13 @@ package org.example.service;
 
 import org.example.dao.StudentDao;
 import org.example.entity.Student;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class StudentService {
-    private StudentDao studentDao;
+    private final StudentDao studentDao;
 
     public StudentService(StudentDao studentDao) {
         this.studentDao = studentDao;
@@ -42,5 +44,9 @@ public class StudentService {
 
     public void addStudentsOnCourse(int courseId, List<Student> students) {
         studentDao.insertListStudentsOnCourse(courseId, students);
+    }
+
+    public void deleteFromCourse(int studentId, int courseId) {
+        studentDao.deleteFromCourse(studentId, courseId);
     }
 }
