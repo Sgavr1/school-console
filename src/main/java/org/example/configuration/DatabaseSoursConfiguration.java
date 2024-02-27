@@ -7,13 +7,13 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Configuration
-public class DatabaseConfiguration {
+public class DatabaseSoursConfiguration {
     private static final String URL = "jdbc:postgresql://localhost:5432/school_db";
     private static final String USERNAME = "administrator";
     private static final String PASSWORD = "admin";
 
     @Bean
-    public DataSource postgresDataSours() {
+    public DataSource getDataSours() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(URL);
         dataSource.setUsername(USERNAME);
