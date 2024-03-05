@@ -1,11 +1,14 @@
 package org.example.service;
 
+import org.example.configuration.MapperConfiguration;
 import org.example.dao.GroupDao;
+import org.example.dto.GroupDto;
 import org.example.entity.Group;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,19 +17,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(classes = {GroupService.class, MapperConfiguration.class})
 public class GroupServiceTest {
 
     private static final String GROUP_NAME_1 = "AB-01";
     private static final String GROUP_NAME_2 = "SA-02";
+    @MockBean
     private GroupDao groupDao;
+    @Autowired
     private GroupService groupService;
-
-    @BeforeAll
-    public void init() {
-        groupDao = Mockito.mock(GroupDao.class);
-        groupService = new GroupService(groupDao);
-    }
 
     @Test
     public void getGroupWhenCorrectGroupName() {
@@ -34,9 +33,9 @@ public class GroupServiceTest {
         group.setId(1);
         group.setName(GROUP_NAME_1);
 
-        Mockito.when(groupDao.getGroupByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
+        when(groupDao.getGroupByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
 
-        Group response = groupService.getGroupByName(GROUP_NAME_1);
+        GroupDto response = groupService.getGroupByName(GROUP_NAME_1);
 
         verify(groupDao).getGroupByName(GROUP_NAME_1);
 
@@ -59,12 +58,12 @@ public class GroupServiceTest {
 
         Mockito.when(groupDao.getGroupGreaterOrEqualsStudents(5)).thenReturn(groups);
 
-        List<Group> response = groupService.getGroupsGreaterOrEqualsStudents(5);
+        List<GroupDto> response = groupService.getGroupsGreaterOrEqualsStudents(5);
 
         verify(groupDao).getGroupGreaterOrEqualsStudents(5);
 
-        Group responseGroup1 = response.get(0);
-        Group responseGroup2 = response.get(1);
+        GroupDto responseGroup1 = response.get(0);
+        GroupDto responseGroup2 = response.get(1);
 
         assertEquals(1, responseGroup1.getId());
         assertEquals(GROUP_NAME_1, responseGroup1.getName());
@@ -74,22 +73,21 @@ public class GroupServiceTest {
 
     @Test
     public void shouldAddGroup() {
-        Group group = new Group(GROUP_NAME_1);
-        group.setId(1);
+        GroupDto group = new GroupDto();
 
         groupService.addGroup(group);
 
-        verify(groupDao).insert(group);
+        verify(groupDao).insert(any(Group.class));
 
     }
 
     @Test
     public void shouldAddGroups() {
-        List<Group> groups = new ArrayList<>();
+        List<GroupDto> groups = new ArrayList<>();
 
         groupService.addGroups(groups);
 
-        verify(groupDao).insertList(groups);
+        verify(groupDao).insertList(anyList());
     }
 
     @Test
@@ -107,12 +105,12 @@ public class GroupServiceTest {
 
         Mockito.when(groupDao.getAll()).thenReturn(groups);
 
-        List<Group> response = groupService.getGroups();
+        List<GroupDto> response = groupService.getGroups();
 
         verify(groupDao).getAll();
 
-        Group responseGroup1 = response.get(0);
-        Group responseGroup2 = response.get(1);
+        GroupDto responseGroup1 = response.get(0);
+        GroupDto responseGroup2 = response.get(1);
 
         assertEquals(1, responseGroup1.getId());
         assertEquals(GROUP_NAME_1, responseGroup1.getName());

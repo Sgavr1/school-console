@@ -1,8 +1,8 @@
 package org.example;
 
-import org.example.entity.Course;
-import org.example.entity.Group;
-import org.example.entity.Student;
+import org.example.dto.CourseDto;
+import org.example.dto.GroupDto;
+import org.example.dto.StudentDto;
 import org.example.service.CourseService;
 import org.example.service.GroupService;
 import org.example.service.StudentService;
@@ -34,16 +34,15 @@ public class DatabaseSetupManager {
         String[] firstNames = fileReader.read("src/main/resources/firstNames.txt").split("\n");
         String[] lastNames = fileReader.read("src/main/resources/lastNames.txt").split("\n");
 
-        List<Student> students = new ArrayList<>();
+        List<StudentDto> students = new ArrayList<>();
 
         Random random = new Random();
         for (int i = 0; i < 200; i++) {
-            Student student = new Student();
-            student.setFirstName(firstNames[random.nextInt(0, firstNames.length)]);
-            student.setLastName(lastNames[random.nextInt(0, lastNames.length)]);
-            student.setGroupId(random.nextInt(1, 11));
-
-            students.add(student);
+            students.add(StudentDto.builder()
+                    .firstName(firstNames[random.nextInt(0, firstNames.length)])
+                    .lastName(lastNames[random.nextInt(0, lastNames.length)])
+                    .groupId(random.nextInt(1, 11))
+                    .build());
         }
 
         studentService.addStudents(students);
@@ -63,7 +62,8 @@ public class DatabaseSetupManager {
                 }
             }
 
-            studentService.addStudentsOnCourse(i, students.stream().map(id -> new Student(id)).toList());
+            studentService.addStudentsOnCourse(i, students.stream()
+                    .map(id -> StudentDto.builder().id(id).build()).toList());
         }
     }
 
@@ -72,14 +72,13 @@ public class DatabaseSetupManager {
 
         String[] coursesString = fileReader.read("src/main/resources/Courses.txt").split("\n");
 
-        List<Course> courses = new ArrayList<>();
+        List<CourseDto> courses = new ArrayList<>();
 
         for (int i = 0; i < coursesString.length; i++) {
-            Course course = new Course();
-            course.setName(coursesString[i].split("_")[0]);
-            course.setDescription(coursesString[i].split("_")[1]);
-
-            courses.add(course);
+            courses.add(CourseDto.builder()
+                    .name(coursesString[i].split("_")[0])
+                    .description(coursesString[i].split("_")[1])
+                    .build());
         }
 
         courseService.addCourses(courses);
@@ -88,7 +87,7 @@ public class DatabaseSetupManager {
     public void insertGroup() {
         String[] groupsNames = reader.read("src/main/resources/Groups.txt").split("\n");
 
-        groupService.addGroups(Arrays.stream(groupsNames).map(str -> new Group(str)).toList());
+        groupService.addGroups(Arrays.stream(groupsNames).map(str -> GroupDto.builder().name(str).build()).toList());
 
     }
 }

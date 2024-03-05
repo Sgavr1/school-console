@@ -1,6 +1,6 @@
 package org.example.command;
 
-import org.example.entity.Student;
+import org.example.dto.StudentDto;
 import org.example.service.StudentService;
 
 import java.util.Scanner;
@@ -24,7 +24,7 @@ public class DeleteStudentCommand implements Command {
 
     @Override
     public void start() {
-        Student student = new Student();
+        StudentDto student = new StudentDto();
 
         do {
             System.out.print(WRITE_STUDENT_ID);

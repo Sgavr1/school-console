@@ -1,7 +1,8 @@
 package org.example.service;
 
 import org.example.dao.GroupDao;
-import org.example.entity.Group;
+import org.example.dto.GroupDto;
+import org.example.map.GroupDtoMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,28 +10,30 @@ import java.util.List;
 @Service
 public class GroupService {
     private final GroupDao groupDao;
+    private final GroupDtoMapper groupDtoMapper;
 
-    public GroupService(GroupDao groupDao) {
+    public GroupService(GroupDao groupDao, GroupDtoMapper groupDtoMapper) {
         this.groupDao = groupDao;
+        this.groupDtoMapper = groupDtoMapper;
     }
 
-    public List<Group> getGroupsGreaterOrEqualsStudents(int studentsAmount) {
-        return groupDao.getGroupGreaterOrEqualsStudents(studentsAmount);
+    public List<GroupDto> getGroupsGreaterOrEqualsStudents(int studentsAmount) {
+        return groupDao.getGroupGreaterOrEqualsStudents(studentsAmount).stream().map(groupDtoMapper::mapGroupToDto).toList();
     }
 
-    public void addGroup(Group group) {
-        groupDao.insert(group);
+    public void addGroup(GroupDto group) {
+        groupDao.insert(groupDtoMapper.mapDtoToGroup(group));
     }
 
-    public void addGroups(List<Group> groups) {
-        groupDao.insertList(groups);
+    public void addGroups(List<GroupDto> groups) {
+        groupDao.insertList(groups.stream().map(groupDtoMapper::mapDtoToGroup).toList());
     }
 
-    public List<Group> getGroups() {
-        return groupDao.getAll();
+    public List<GroupDto> getGroups() {
+        return groupDao.getAll().stream().map(groupDtoMapper::mapGroupToDto).toList();
     }
 
-    public Group getGroupByName(String name) {
-        return groupDao.getGroupByName(name).orElse(null);
+    public GroupDto getGroupByName(String name) {
+        return groupDao.getGroupByName(name).map(groupDtoMapper::mapGroupToDto).orElse(null);
     }
 }

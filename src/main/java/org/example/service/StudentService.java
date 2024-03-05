@@ -1,7 +1,8 @@
 package org.example.service;
 
 import org.example.dao.StudentDao;
-import org.example.entity.Student;
+import org.example.dto.StudentDto;
+import org.example.map.StudentDtoMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,41 +10,43 @@ import java.util.List;
 @Service
 public class StudentService {
     private final StudentDao studentDao;
+    private final StudentDtoMapper studentDtoMapper;
 
-    public StudentService(StudentDao studentDao) {
+    public StudentService(StudentDao studentDao, StudentDtoMapper studentDtoMapper) {
         this.studentDao = studentDao;
+        this.studentDtoMapper = studentDtoMapper;
     }
 
-    public void addStudent(Student student) {
-        studentDao.insert(student);
+    public void addStudent(StudentDto student) {
+        studentDao.insert(studentDtoMapper.mapDtoToStudent(student));
     }
 
-    public void addStudents(List<Student> students) {
-        studentDao.insertList(students);
+    public void addStudents(List<StudentDto> students) {
+        studentDao.insertList(students.stream().map(studentDtoMapper::mapDtoToStudent).toList());
     }
 
-    public Student getStudentById(int id) {
-        return studentDao.getById(id).orElse(null);
+    public StudentDto getStudentById(int id) {
+        return studentDao.getById(id).map(studentDtoMapper::mapStudentToDto).orElse(null);
     }
 
-    public List<Student> getStudentsByCourseName(String courseName) {
-        return studentDao.getStudentsByCourseName(courseName);
+    public List<StudentDto> getStudentsByCourseName(String courseName) {
+        return studentDao.getStudentsByCourseName(courseName).stream().map(studentDtoMapper::mapStudentToDto).toList();
     }
 
-    public void delete(Student student) {
+    public void delete(StudentDto student) {
         studentDao.delete(student.getId());
     }
 
-    public List<Student> getStudents() {
-        return studentDao.getAll();
+    public List<StudentDto> getStudents() {
+        return studentDao.getAll().stream().map(studentDtoMapper::mapStudentToDto).toList();
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
         studentDao.insertStudentToCourse(studentId, courseId);
     }
 
-    public void addStudentsOnCourse(int courseId, List<Student> students) {
-        studentDao.insertListStudentsOnCourse(courseId, students);
+    public void addStudentsOnCourse(int courseId, List<StudentDto> students) {
+        studentDao.insertListStudentsOnCourse(courseId, students.stream().map(studentDtoMapper::mapDtoToStudent).toList());
     }
 
     public void deleteFromCourse(int studentId, int courseId) {

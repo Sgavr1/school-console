@@ -36,6 +36,7 @@ public class JdbcCourseDao implements CourseDao {
             LEFT JOIN courses ON courses.course_id = student_course.course_id
             WHERE students.student_id = ?;
             """;
+
     private final JdbcTemplate template;
     private final RowMapper<Course> courseMapper;
 

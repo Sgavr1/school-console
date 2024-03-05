@@ -1,7 +1,7 @@
 package org.example.command;
 
-import org.example.entity.Group;
-import org.example.entity.Student;
+import org.example.dto.GroupDto;
+import org.example.dto.StudentDto;
 import org.example.service.GroupService;
 import org.example.service.StudentService;
 
@@ -31,7 +31,7 @@ public class AddStudentCommand implements Command {
 
     @Override
     public void start() {
-        Student student = new Student();
+        StudentDto student = new StudentDto();
 
         System.out.print(WRITE_FIRST_NAME);
         student.setFirstName(scanner.next());
@@ -40,7 +40,7 @@ public class AddStudentCommand implements Command {
 
         groupService.getGroups().stream().forEach(group -> System.out.println(GROUP_NAME + group.getName()));
 
-        Group group = new Group();
+        GroupDto group = new GroupDto();
         do {
             System.out.print(CHOOSE_GROUP);
             group.setName(scanner.next());

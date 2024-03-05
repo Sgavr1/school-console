@@ -1,12 +1,16 @@
 package org.example.service;
 
+import org.example.configuration.MapperConfiguration;
 import org.example.dao.CourseDao;
+import org.example.dto.CourseDto;
+import org.example.dto.StudentDto;
 import org.example.entity.Course;
 import org.example.entity.Student;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -15,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(classes = {CourseService.class, MapperConfiguration.class})
 public class CourseServiceTest {
 
     private static final String COURSE_NAME = "Вступ до програмування";
@@ -25,14 +29,10 @@ public class CourseServiceTest {
     private static final String STUDENT_2_FIRST_NAME = "Андрей";
     private static final String STUDENT_2_LAST_NAME = "Григоренко";
 
+    @MockBean
     private CourseDao courseDao;
+    @Autowired
     private CourseService courseService;
-
-    @BeforeAll
-    public void init() {
-        courseDao = Mockito.mock(CourseDao.class);
-        courseService = new CourseService(courseDao);
-    }
 
     @Test
     public void getCourseWhenCorrectCourseName() {
@@ -40,9 +40,9 @@ public class CourseServiceTest {
         correctCourse.setName(COURSE_NAME);
         correctCourse.setDescription(COURSE_DESCRIPTION);
 
-        Mockito.when(courseDao.getByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
+        when(courseDao.getByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
 
-        Course response = courseService.getCourseByName(COURSE_NAME);
+        CourseDto response = courseService.getCourseByName(COURSE_NAME);
 
         verify(courseDao).getByName(COURSE_NAME);
 
@@ -52,20 +52,20 @@ public class CourseServiceTest {
 
     @Test
     public void shouldAddCourse() {
-        Course course = new Course();
+        CourseDto course = new CourseDto();
 
         courseService.addCourse(course);
 
-        verify(courseDao).insert(course);
+        verify(courseDao).insert(any(Course.class));
     }
 
     @Test
     public void shouldAddCourses() {
-        List<Course> courses = new ArrayList<>();
+        List<CourseDto> courses = new ArrayList<>();
 
         courseService.addCourses(courses);
 
-        verify(courseDao).insertList(courses);
+        verify(courseDao).insertList(anyList());
     }
 
     @Test
@@ -93,11 +93,11 @@ public class CourseServiceTest {
 
         Mockito.when(courseDao.getAll()).thenReturn(courses);
 
-        List<Course> response = courseService.getAllCourses();
+        List<CourseDto> response = courseService.getAllCourses();
 
-        Course responseCourse = response.get(0);
-        Student responseStudent1 = responseCourse.getStudents().get(0);
-        Student responseStudent2 = responseCourse.getStudents().get(1);
+        CourseDto responseCourse = response.get(0);
+        StudentDto responseStudent1 = responseCourse.getStudents().get(0);
+        StudentDto responseStudent2 = responseCourse.getStudents().get(1);
 
         verify(courseDao).getAll();
 
