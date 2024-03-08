@@ -99,6 +99,10 @@ public class StudentDto {
         }
 
         public StudentDto build() {
+            if (courses == null) {
+                courses = new ArrayList<>();
+            }
+
             return new StudentDto(id, firstName, lastName, groupId, courses);
         }
     }

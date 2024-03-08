@@ -1,34 +1,52 @@
-package org.example;
+package org.example.service;
 
+import org.example.FileReader;
 import org.example.dto.CourseDto;
 import org.example.dto.GroupDto;
 import org.example.dto.StudentDto;
-import org.example.service.CourseService;
-import org.example.service.GroupService;
-import org.example.service.StudentService;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-@Component
-public class DatabaseSetupManager {
+@Service
+public class DatabaseSetupService implements ApplicationRunner {
     private final FileReader reader;
     private final StudentService studentService;
     private final CourseService courseService;
     private final GroupService groupService;
+    private Random random;
 
-    public DatabaseSetupManager(FileReader reader, StudentService studentService, CourseService courseService, GroupService groupService) {
+    public DatabaseSetupService(FileReader reader, StudentService studentService, CourseService courseService, GroupService groupService) {
         this.reader = reader;
-
         this.studentService = studentService;
         this.courseService = courseService;
         this.groupService = groupService;
+
+        this.random = new Random();
     }
 
-    public void insertRandomStudents() {
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        if (groupService.isEmpty()) {
+            addGroup();
+        }
+
+        if (courseService.isEmpty()) {
+            addCourses();
+        }
+
+        if (studentService.isEmpty()) {
+            addRandomStudents();
+            addStudentCourse();
+        }
+    }
+
+    public void addRandomStudents() {
         FileReader fileReader = new FileReader();
 
         String[] firstNames = fileReader.read("src/main/resources/firstNames.txt").split("\n");
@@ -36,7 +54,6 @@ public class DatabaseSetupManager {
 
         List<StudentDto> students = new ArrayList<>();
 
-        Random random = new Random();
         for (int i = 0; i < 200; i++) {
             students.add(StudentDto.builder()
                     .firstName(firstNames[random.nextInt(0, firstNames.length)])
@@ -48,9 +65,7 @@ public class DatabaseSetupManager {
         studentService.addStudents(students);
     }
 
-    public void insertStudentCourse() {
-        Random random = new Random();
-
+    public void addStudentCourse() {
         for (int i = 1; i < 11; i++) {
             int numberStudents = random.nextInt(0, 50);
             List<Integer> students = new ArrayList<>(numberStudents);
@@ -67,7 +82,7 @@ public class DatabaseSetupManager {
         }
     }
 
-    public void insertCourses() {
+    public void addCourses() {
         FileReader fileReader = new FileReader();
 
         String[] coursesString = fileReader.read("src/main/resources/Courses.txt").split("\n");
@@ -84,7 +99,7 @@ public class DatabaseSetupManager {
         courseService.addCourses(courses);
     }
 
-    public void insertGroup() {
+    public void addGroup() {
         String[] groupsNames = reader.read("src/main/resources/Groups.txt").split("\n");
 
         groupService.addGroups(Arrays.stream(groupsNames).map(str -> GroupDto.builder().name(str).build()).toList());

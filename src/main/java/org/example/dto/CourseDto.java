@@ -83,6 +83,10 @@ public class CourseDto {
         }
 
         public CourseDto build() {
+            if (students == null) {
+                students = new ArrayList<>();
+            }
+
             return new CourseDto(id, name, description, students);
         }
     }

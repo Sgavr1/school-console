@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcStudentDao implements StudentDao {
+    private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(student_id) From students;";
     private static final String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
     private static final String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?);";
     private static final String QUERY_SELECT_BY_ID = """
@@ -102,7 +103,7 @@ public class JdbcStudentDao implements StudentDao {
 
     @Override
     public void delete(int id) {
-        try(Connection connection = template.getDataSource().getConnection()) {
+        try (Connection connection = template.getDataSource().getConnection()) {
             connection.setAutoCommit(false);
             template.update(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID, id);
             template.update(QUERY_DELETE_BY_ID, id);
@@ -176,6 +177,11 @@ public class JdbcStudentDao implements StudentDao {
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean isEmptyTable() {
+        return template.queryForObject(QUERY_CHECK_EMPTY_TABLE, Integer.class) == 0;
     }
 
     private List<Student> buldUniqueList(List<Student> students) {

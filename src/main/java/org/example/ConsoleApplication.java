@@ -14,16 +14,10 @@ import java.util.Scanner;
 public class ConsoleApplication {
     private static final String CHOOSE_COMMAND = "Choose a command: ";
     private static final String COMMAND_EXIT = "Exit";
-    private static final String BEGIN_MESSAGE = "Fill the database? (Be careful, if there is already data in the database, it is better to choose \"no\")";
-    private static final String COMMAND_YES = "1 - YES";
-    private static final String COMMAND_NO = "2 - NO";
     private Scanner scanner;
-    private final DatabaseSetupManager databaseSetupManager;
     private Map<Integer, Command> commands;
 
-    public ConsoleApplication(DatabaseSetupManager setupManager, StudentService studentService, GroupService groupService, CourseService courseService) {
-        this.databaseSetupManager = setupManager;
-
+    public ConsoleApplication(StudentService studentService, GroupService groupService, CourseService courseService) {
         scanner = new Scanner(System.in);
         commands = new HashMap<>();
 
@@ -36,23 +30,8 @@ public class ConsoleApplication {
         commands.put(7, new RemoveStudentCourseCommand(studentService, courseService, scanner));
     }
 
-    private void setupDatabase() {
-        databaseSetupManager.insertGroup();
-        databaseSetupManager.insertCourses();
-        databaseSetupManager.insertRandomStudents();
-        databaseSetupManager.insertStudentCourse();
-    }
-
     public void start() {
-        System.out.println(BEGIN_MESSAGE);
-        System.out.println(COMMAND_YES);
-        System.out.println(COMMAND_NO);
-
-        int numberCommand = scanner.nextInt();
-
-        if (numberCommand == 1) {
-            setupDatabase();
-        }
+        int numberCommand;
 
         while (true) {
             for (Map.Entry<Integer, Command> command : commands.entrySet()) {

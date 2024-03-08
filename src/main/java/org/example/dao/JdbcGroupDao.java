@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcGroupDao implements GroupDao {
+    private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(group_id) From groups;";
     private static final String QUERY_INSERT = "INSERT INTO groups(group_name) VALUES(?);";
     private static final String QUERY_SELECT_ALL = """
             SELECT groups.*, students.*
@@ -100,6 +101,11 @@ public class JdbcGroupDao implements GroupDao {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public boolean isEmptyTable() {
+        return template.queryForObject(QUERY_CHECK_EMPTY_TABLE, Integer.class) == 0;
     }
 
     private List<Group> buildUniqueList(List<Group> groups) {

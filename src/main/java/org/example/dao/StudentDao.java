@@ -26,4 +26,6 @@ public interface StudentDao {
     void insertStudentToCourse(int studentId, int courseId);
 
     void insertListStudentsOnCourse(int courseId, List<Student> students);
+
+    boolean isEmptyTable();
 }

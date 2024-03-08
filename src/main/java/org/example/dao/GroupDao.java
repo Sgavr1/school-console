@@ -16,4 +16,6 @@ public interface GroupDao {
     List<Group> getAll();
 
     Optional<Group> getGroupByName(String name);
+
+    boolean isEmptyTable();
 }

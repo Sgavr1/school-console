@@ -16,4 +16,6 @@ public interface CourseDao {
     Optional<Course> getByName(String name);
 
     List<Course> getCoursesByStudentId(int studentId);
+
+    boolean isEmptyTable();
 }

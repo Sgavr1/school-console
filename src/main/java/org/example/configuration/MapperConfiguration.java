@@ -29,25 +29,4 @@ public class MapperConfiguration {
         groupMapper.setStudentMapper(studentMapper);
         return groupMapper;
     }
-
-    @Bean
-    public StudentDtoMapper getStudentDtoMapper() {
-        StudentDtoMapper studentDtoMapper = new StudentDtoMapper();
-        studentDtoMapper.setCourseDtoMapper(new CourseDtoMapper());
-        return studentDtoMapper;
-    }
-
-    @Bean
-    public CourseDtoMapper getCourseDtoMapper() {
-        CourseDtoMapper courseDtoMapper = new CourseDtoMapper();
-        courseDtoMapper.setStudentDtoMapper(new StudentDtoMapper());
-        return courseDtoMapper;
-    }
-
-    @Bean
-    public GroupDtoMapper getGroupDtoMapper() {
-        GroupDtoMapper groupDtoMapper = new GroupDtoMapper();
-        groupDtoMapper.setStudentDtoMapper(new StudentDtoMapper());
-        return groupDtoMapper;
-    }
 }

@@ -68,6 +68,10 @@ public class GroupDto {
         }
 
         public GroupDto build() {
+            if (students == null) {
+                students = new ArrayList<>();
+            }
+
             return new GroupDto(id, name, students);
         }
     }

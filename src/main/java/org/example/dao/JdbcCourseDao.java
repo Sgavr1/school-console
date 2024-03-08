@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcCourseDao implements CourseDao {
+    private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(course_id) From courses;";
     private static final String QUERY_INSERT = "INSERT INTO courses(course_name, course_description) VALUES(?,?);";
     private static final String QUERY_SELECT_ALL = """
             SELECT courses.*, students.*
@@ -105,6 +106,11 @@ public class JdbcCourseDao implements CourseDao {
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public boolean isEmptyTable() {
+        return template.queryForObject(QUERY_CHECK_EMPTY_TABLE, Integer.class) == 0;
     }
 
     private List<Course> buildUniqueList(List<Course> courses) {
