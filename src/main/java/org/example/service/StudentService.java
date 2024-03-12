@@ -2,7 +2,8 @@ package org.example.service;
 
 import org.example.dao.StudentDao;
 import org.example.dto.StudentDto;
-import org.example.map.StudentMapper;
+import org.example.entity.Student;
+import org.example.map.dto.StudentMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class StudentService {
         studentDao.insertStudentToCourse(studentId, courseId);
     }
 
-    public void addStudentsOnCourse(int courseId, List<StudentDto> students) {
+    public void addStudentsToCourse(int courseId, List<StudentDto> students) {
         studentDao.insertListStudentsOnCourse(courseId, students.stream().map(studentMapper::toEntity).toList());
     }
 

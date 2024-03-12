@@ -28,7 +28,7 @@ public class GroupServiceTest {
     private GroupService groupService;
 
     @Test
-    public void getGroupWhenCorrectGroupName() {
+    public void shouldGroupWhenCorrectGroupName() {
         Group group = new Group();
         group.setId(1);
         group.setName(GROUP_NAME_1);
@@ -44,7 +44,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void getListGroupWhenNumbersStudentGreaterOrEqualsNumber() {
+    public void shouldListGroupWhenNumbersStudentGreaterOrEqualsNumber() {
         List<Group> groups = new ArrayList<>();
         Group group = new Group();
         group.setId(1);
@@ -91,7 +91,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testListAllGroups() {
+    public void shouldListAllGroups() {
         List<Group> groups = new ArrayList<>();
         Group group = new Group(GROUP_NAME_1);
         group.setId(1);

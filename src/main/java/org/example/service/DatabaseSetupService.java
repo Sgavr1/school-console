@@ -77,7 +77,7 @@ public class DatabaseSetupService implements ApplicationRunner {
                 }
             }
 
-            studentService.addStudentsOnCourse(i, students.stream()
+            studentService.addStudentsToCourse(i, students.stream()
                     .map(id -> StudentDto.builder().id(id).build()).toList());
         }
     }

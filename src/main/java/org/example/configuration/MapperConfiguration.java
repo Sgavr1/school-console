@@ -1,6 +1,12 @@
 package org.example.configuration;
 
-import org.example.map.*;
+import org.example.map.dto.CourseMapper;
+import org.example.map.dto.GroupMapper;
+import org.example.map.dto.StudentMapper;
+import org.example.map.row.CourseRowMapper;
+import org.example.map.row.GroupRowMapper;
+import org.example.map.row.StudentRowMapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,25 +14,40 @@ import org.springframework.context.annotation.Configuration;
 public class MapperConfiguration {
     @Bean
     public StudentMapper getStudentMapper() {
-        StudentMapper studentMapper = new StudentMapper();
-        CourseMapper courseMapper = new CourseMapper();
-        studentMapper.setCourseMapper(courseMapper);
-        return studentMapper;
+        return Mappers.getMapper(StudentMapper.class);
     }
 
     @Bean
     public CourseMapper getCourseMapper() {
-        CourseMapper courseMapper = new CourseMapper();
-        StudentMapper studentMapper = new StudentMapper();
-        courseMapper.setStudentMapper(studentMapper);
-        return courseMapper;
+        return Mappers.getMapper(CourseMapper.class);
     }
 
     @Bean
     public GroupMapper getGroupMapper() {
-        GroupMapper groupMapper = new GroupMapper();
-        StudentMapper studentMapper = new StudentMapper();
-        groupMapper.setStudentMapper(studentMapper);
-        return groupMapper;
+        return Mappers.getMapper(GroupMapper.class);
+    }
+
+    @Bean
+    public StudentRowMapper getStudentRowMapper(){
+        StudentRowMapper studentRowMapper = new StudentRowMapper();
+        studentRowMapper.setCourseMapper(new CourseRowMapper());
+
+        return studentRowMapper;
+    }
+
+    @Bean
+    public CourseRowMapper getCourseRowMapper(){
+        CourseRowMapper courseRowMapper = new CourseRowMapper();
+        courseRowMapper.setStudentMapper(new StudentRowMapper());
+
+        return courseRowMapper;
+    }
+
+    @Bean
+    public GroupRowMapper getGroupRowMapper(){
+        GroupRowMapper groupRowMapper = new GroupRowMapper();
+        groupRowMapper.setStudentMapper(new StudentRowMapper());
+
+        return groupRowMapper;
     }
 }

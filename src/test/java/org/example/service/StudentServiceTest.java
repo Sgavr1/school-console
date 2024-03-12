@@ -30,7 +30,7 @@ public class StudentServiceTest {
     private StudentService studentService;
 
     @Test
-    public void getStudentWhenCorrectStudentId() {
+    public void shouldStudentWhenCorrectStudentId() {
         Student student = new Student();
         student.setId(1);
         student.setFirstName(STUDENT_1_FIRST_NAME);
@@ -106,17 +106,17 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void shouldAddStudentOnCourse() {
+    public void shouldAddStudentToCourse() {
         studentService.addStudentToCourse(1, 1);
 
         verify(studentDao).insertStudentToCourse(1, 1);
     }
 
     @Test
-    public void shouldAddStudentsOnCourse() {
+    public void shouldAddStudentsToCourse() {
         List<StudentDto> students = new ArrayList<>();
 
-        studentService.addStudentsOnCourse(1, students);
+        studentService.addStudentsToCourse(1, students);
 
         verify(studentDao).insertListStudentsOnCourse(anyInt(), anyList());
     }
@@ -131,7 +131,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void testListAllStudents() {
+    public void shouldListAllStudents() {
         List<Student> students = new ArrayList<>();
         Student student1 = new Student(1);
         student1.setGroupId(4);

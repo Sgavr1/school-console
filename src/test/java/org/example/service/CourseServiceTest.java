@@ -35,7 +35,7 @@ public class CourseServiceTest {
     private CourseService courseService;
 
     @Test
-    public void getCourseWhenCorrectCourseName() {
+    public void shouldCourseWhenCorrectCourseName() {
         Course correctCourse = new Course();
         correctCourse.setName(COURSE_NAME);
         correctCourse.setDescription(COURSE_DESCRIPTION);
@@ -69,7 +69,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void testListAllCourses() {
+    public void shouldListAllCourses() {
         List<Course> courses = new ArrayList<>();
         Course course = new Course();
         course.setId(1);

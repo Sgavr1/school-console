@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.GroupDao;
 import org.example.dto.GroupDto;
-import org.example.map.GroupMapper;
+import org.example.map.dto.GroupMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
