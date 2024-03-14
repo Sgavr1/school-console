@@ -28,7 +28,7 @@ public class GroupServiceTest {
     private GroupService groupService;
 
     @Test
-    public void shouldGroupWhenCorrectGroupName() {
+    public void shouldReturnGroupWhenCorrectGroupName() {
         Group group = new Group();
         group.setId(1);
         group.setName(GROUP_NAME_1);
@@ -44,7 +44,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void shouldListGroupWhenNumbersStudentGreaterOrEqualsNumber() {
+    public void shouldReturnListGroupWhenNumbersStudentLessOrEqualsNumber() {
         List<Group> groups = new ArrayList<>();
         Group group = new Group();
         group.setId(1);
@@ -56,11 +56,11 @@ public class GroupServiceTest {
         group.setName(GROUP_NAME_2);
         groups.add(group);
 
-        Mockito.when(groupDao.getGroupGreaterOrEqualsStudents(5)).thenReturn(groups);
+        Mockito.when(groupDao.getGroupLessOrEqualsStudents(5)).thenReturn(groups);
 
-        List<GroupDto> response = groupService.getGroupsGreaterOrEqualsStudents(5);
+        List<GroupDto> response = groupService.getGroupsLessOrEqualsStudents(5);
 
-        verify(groupDao).getGroupGreaterOrEqualsStudents(5);
+        verify(groupDao).getGroupLessOrEqualsStudents(5);
 
         GroupDto responseGroup1 = response.get(0);
         GroupDto responseGroup2 = response.get(1);
@@ -91,7 +91,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void shouldListAllGroups() {
+    public void shouldReturnListAllGroups() {
         List<Group> groups = new ArrayList<>();
         Group group = new Group(GROUP_NAME_1);
         group.setId(1);

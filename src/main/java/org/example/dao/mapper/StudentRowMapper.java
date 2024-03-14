@@ -1,4 +1,4 @@
-package org.example.map.row;
+package org.example.dao.mapper;
 
 import org.example.entity.Course;
 import org.example.entity.Student;

@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.CourseDao;
 import org.example.dto.CourseDto;
-import org.example.map.dto.CourseMapper;
+import org.example.mapper.CourseMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

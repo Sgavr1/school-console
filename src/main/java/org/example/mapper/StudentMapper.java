@@ -1,4 +1,4 @@
-package org.example.map.dto;
+package org.example.mapper;
 
 import org.example.dto.StudentDto;
 import org.example.entity.Student;

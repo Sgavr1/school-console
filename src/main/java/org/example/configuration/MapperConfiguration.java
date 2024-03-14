@@ -1,11 +1,11 @@
 package org.example.configuration;
 
-import org.example.map.dto.CourseMapper;
-import org.example.map.dto.GroupMapper;
-import org.example.map.dto.StudentMapper;
-import org.example.map.row.CourseRowMapper;
-import org.example.map.row.GroupRowMapper;
-import org.example.map.row.StudentRowMapper;
+import org.example.mapper.CourseMapper;
+import org.example.mapper.GroupMapper;
+import org.example.mapper.StudentMapper;
+import org.example.dao.mapper.CourseRowMapper;
+import org.example.dao.mapper.GroupRowMapper;
+import org.example.dao.mapper.StudentRowMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

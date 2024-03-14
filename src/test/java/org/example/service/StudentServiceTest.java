@@ -30,7 +30,7 @@ public class StudentServiceTest {
     private StudentService studentService;
 
     @Test
-    public void shouldStudentWhenCorrectStudentId() {
+    public void shouldReturnStudentWhenCorrectStudentId() {
         Student student = new Student();
         student.setId(1);
         student.setFirstName(STUDENT_1_FIRST_NAME);
@@ -131,7 +131,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void shouldListAllStudents() {
+    public void shouldReturnListAllStudents() {
         List<Student> students = new ArrayList<>();
         Student student1 = new Student(1);
         student1.setGroupId(4);

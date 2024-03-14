@@ -1,4 +1,4 @@
-package org.example.map.dto;
+package org.example.mapper;
 
 import org.example.dto.CourseDto;
 import org.example.entity.Course;

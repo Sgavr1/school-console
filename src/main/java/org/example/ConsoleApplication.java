@@ -25,7 +25,7 @@ public class ConsoleApplication {
         commands.put(2, new AddStudentCourseCommand(studentService, courseService, scanner));
         commands.put(3, new DeleteStudentCommand(studentService, scanner));
         commands.put(4, new DisplayStudentsCommand(studentService));
-        commands.put(5, new FindGroupsGreaterCommand(groupService, scanner));
+        commands.put(5, new FindGroupsLessCommand(groupService, scanner));
         commands.put(6, new FindStudentsCourseCommand(studentService, scanner));
         commands.put(7, new RemoveStudentCourseCommand(studentService, courseService, scanner));
     }

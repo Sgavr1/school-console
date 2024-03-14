@@ -69,7 +69,7 @@ public class CourseServiceTest {
     }
 
     @Test
-    public void shouldListAllCourses() {
+    public void shouldReturnListAllCourses() {
         List<Course> courses = new ArrayList<>();
         Course course = new Course();
         course.setId(1);

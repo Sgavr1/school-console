@@ -1,4 +1,4 @@
-package org.example.map.dto;
+package org.example.mapper;
 
 import org.example.dto.GroupDto;
 import org.example.entity.Group;

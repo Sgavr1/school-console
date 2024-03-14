@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface GroupDao {
 
-    List<Group> getGroupGreaterOrEqualsStudents(int studentsAmount);
+    List<Group> getGroupLessOrEqualsStudents(int studentsAmount);
 
     void insert(Group group);
 

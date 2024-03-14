@@ -28,13 +28,13 @@ public class JdbcGroupDao implements GroupDao {
             LEFT JOIN students ON students.group_id = groups.group_id
             WHERE groups.group_name = ?;
             """;
-    private static final String QUERY_SELECT_LARGE_OR_EQUALS_STUDENT = """
+    private static final String QUERY_SELECT_LESS_OR_EQUALS_STUDENT = """
             SELECT groups.*, s.*
             FROM groups
             LEFT JOIN students ON students.group_id = groups.group_id
             LEFT JOIN students as s ON s.group_id = groups.group_id
             GROUP BY group_name, groups.group_id, s.student_id
-            HAVING count(students.student_id) >= ?;
+            HAVING count(students.student_id) <= ?;
             """;
     private final JdbcTemplate template;
     private final RowMapper<Group> groupMapper;
@@ -45,9 +45,9 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     @Override
-    public List<Group> getGroupGreaterOrEqualsStudents(int studentsAmount) {
+    public List<Group> getGroupLessOrEqualsStudents(int studentsAmount) {
         try {
-            return buildUniqueList(template.query(QUERY_SELECT_LARGE_OR_EQUALS_STUDENT, groupMapper, studentsAmount));
+            return buildUniqueList(template.query(QUERY_SELECT_LESS_OR_EQUALS_STUDENT, groupMapper, studentsAmount));
         } catch (EmptyResultDataAccessException e) {
             return new ArrayList<>();
         }

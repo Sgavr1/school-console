@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.dao.GroupDao;
 import org.example.dto.GroupDto;
-import org.example.map.dto.GroupMapper;
+import org.example.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +17,8 @@ public class GroupService {
         this.groupMapper = groupMapper;
     }
 
-    public List<GroupDto> getGroupsGreaterOrEqualsStudents(int studentsAmount) {
-        return groupDao.getGroupGreaterOrEqualsStudents(studentsAmount).stream().map(groupMapper::toDto).toList();
+    public List<GroupDto> getGroupsLessOrEqualsStudents(int studentsAmount) {
+        return groupDao.getGroupLessOrEqualsStudents(studentsAmount).stream().map(groupMapper::toDto).toList();
     }
 
     public void addGroup(GroupDto group) {

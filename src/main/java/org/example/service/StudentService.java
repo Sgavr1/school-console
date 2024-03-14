@@ -2,8 +2,7 @@ package org.example.service;
 
 import org.example.dao.StudentDao;
 import org.example.dto.StudentDto;
-import org.example.entity.Student;
-import org.example.map.dto.StudentMapper;
+import org.example.mapper.StudentMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -48,10 +48,10 @@ public class JdbcGroupDaoTest {
     }
 
     @Test
-    public void shouldGetGroupGreaterOrEqualsStudents() {
-        List<Group> groups = groupDao.getGroupGreaterOrEqualsStudents(2);
+    public void shouldGetGroupLessOrEqualsStudents() {
+        List<Group> groups = groupDao.getGroupLessOrEqualsStudents(2);
 
-        assertEquals(1, groups.size());
+        assertEquals(2, groups.size());
     }
 
     @Test
