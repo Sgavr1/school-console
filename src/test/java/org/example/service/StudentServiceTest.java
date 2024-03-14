@@ -50,7 +50,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void shouldGetByCourseName() {
+    public void shouldReturnByCourseName() {
         List<Student> students = new ArrayList<>();
 
         Student student1 = new Student(1);

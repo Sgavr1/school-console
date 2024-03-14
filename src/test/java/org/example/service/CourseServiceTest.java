@@ -35,7 +35,7 @@ public class CourseServiceTest {
     private CourseService courseService;
 
     @Test
-    public void shouldCourseWhenCorrectCourseName() {
+    public void shouldReturnCourseWhenCorrectCourseName() {
         Course correctCourse = new Course();
         correctCourse.setName(COURSE_NAME);
         correctCourse.setDescription(COURSE_DESCRIPTION);

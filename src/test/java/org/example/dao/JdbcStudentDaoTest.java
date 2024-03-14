@@ -124,7 +124,7 @@ public class JdbcStudentDaoTest {
     }
 
     @Test
-    public void deleteFromAllCoursesByStudentId() {
+    public void shouldDeleteFromAllCoursesByStudentId() {
         studentDao.deleteFromAllCoursesByStudentId(1);
 
         Optional<Student> optionalStudent = studentDao.getById(1);
