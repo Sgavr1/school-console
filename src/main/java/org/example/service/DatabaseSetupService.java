@@ -4,6 +4,8 @@ import org.example.FileReader;
 import org.example.dto.CourseDto;
 import org.example.dto.GroupDto;
 import org.example.dto.StudentDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.Random;
 
 @Service
 public class DatabaseSetupService implements ApplicationRunner {
+    private final Logger logger = LoggerFactory.getLogger(DatabaseSetupService.class);
     private final FileReader reader;
     private final StudentService studentService;
     private final CourseService courseService;
@@ -32,6 +35,8 @@ public class DatabaseSetupService implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        logger.info("Start database setup");
+
         if (groupService.isEmpty()) {
             addGroup();
         }
@@ -47,6 +52,8 @@ public class DatabaseSetupService implements ApplicationRunner {
     }
 
     public void addRandomStudents() {
+        logger.info("Database setup add random students");
+
         FileReader fileReader = new FileReader();
 
         String[] firstNames = fileReader.read("src/main/resources/firstNames.txt").split("\n");
@@ -66,6 +73,8 @@ public class DatabaseSetupService implements ApplicationRunner {
     }
 
     public void addStudentCourse() {
+        logger.info("Database setup add random students on course");
+
         for (int i = 1; i < 11; i++) {
             int numberStudents = random.nextInt(0, 50);
             List<Integer> students = new ArrayList<>(numberStudents);
@@ -83,6 +92,8 @@ public class DatabaseSetupService implements ApplicationRunner {
     }
 
     public void addCourses() {
+        logger.info("Database setup add course");
+
         FileReader fileReader = new FileReader();
 
         String[] coursesString = fileReader.read("src/main/resources/Courses.txt").split("\n");
@@ -100,6 +111,8 @@ public class DatabaseSetupService implements ApplicationRunner {
     }
 
     public void addGroup() {
+        logger.info("Database setup add group");
+
         String[] groupsNames = reader.read("src/main/resources/Groups.txt").split("\n");
 
         groupService.addGroups(Arrays.stream(groupsNames).map(str -> GroupDto.builder().name(str).build()).toList());

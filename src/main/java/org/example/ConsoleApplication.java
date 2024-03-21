@@ -4,6 +4,8 @@ import org.example.command.*;
 import org.example.service.CourseService;
 import org.example.service.GroupService;
 import org.example.service.StudentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Scanner;
 
 @Component
 public class ConsoleApplication {
+    private final Logger logger = LoggerFactory.getLogger(ConsoleApplication.class);
     private static final String CHOOSE_COMMAND = "Choose a command: ";
     private static final String COMMAND_EXIT = "Exit";
     private Scanner scanner;
@@ -31,6 +34,8 @@ public class ConsoleApplication {
     }
 
     public void start() {
+        logger.info("Start console application");
+
         int numberCommand;
 
         while (true) {
@@ -50,5 +55,7 @@ public class ConsoleApplication {
                 }
             }
         }
+
+        logger.info("Finish console application");
     }
 }

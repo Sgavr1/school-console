@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.entity.Student;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcStudentDao implements StudentDao {
+    private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(student_id) From students;";
     private static final String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
     private static final String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?);";
@@ -62,6 +65,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_INSERT, student.getFirstName(), student.getLastName(), student.getGroupId());
         } catch (DataAccessException e) {
+            logger.info("Error insert student: firstName = %s lastName = %s ", student.getFirstName(), student.getLastName());
             e.printStackTrace();
         }
     }
@@ -84,6 +88,7 @@ public class JdbcStudentDao implements StudentDao {
                 }
             });
         } catch (DataAccessException e) {
+            logger.info("Error insert list students");
             e.printStackTrace();
         }
     }
@@ -110,6 +115,7 @@ public class JdbcStudentDao implements StudentDao {
             connection.commit();
             connection.setAutoCommit(true);
         } catch (DataAccessException | SQLException e) {
+            logger.info("Error delete student by id = %d", id);
             e.printStackTrace();
         }
     }
@@ -119,6 +125,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID, id);
         } catch (DataAccessException e) {
+            logger.info("Error deleting student from all courses by id = %d", id);
             e.printStackTrace();
         }
     }
@@ -128,6 +135,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_DELETE_FROM_COURSE, studentId, courseId);
         } catch (DataAccessException e) {
+            logger.info("Error delete student from course: studentId = %d courseId = %d", studentId, courseId);
             e.printStackTrace();
         }
     }
@@ -155,6 +163,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_INSERT_STUDENT_COURSE, studentId, courseId);
         } catch (DataAccessException e) {
+            logger.info("Error insert student on course: studentId = %d courseId = %d", studentId, courseId);
             e.printStackTrace();
         }
     }
@@ -175,6 +184,7 @@ public class JdbcStudentDao implements StudentDao {
                 }
             });
         } catch (DataAccessException e) {
+            logger.info("Error insert list students on courses");
             e.printStackTrace();
         }
     }

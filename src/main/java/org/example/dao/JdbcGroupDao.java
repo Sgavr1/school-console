@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.entity.Group;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcGroupDao implements GroupDao {
+    private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(group_id) From groups;";
     private static final String QUERY_INSERT = "INSERT INTO groups(group_name) VALUES(?);";
     private static final String QUERY_SELECT_ALL = """
@@ -58,6 +61,7 @@ public class JdbcGroupDao implements GroupDao {
         try {
             template.update(QUERY_INSERT, group.getName());
         } catch (DataAccessException e) {
+            logger.info("Error insert group: name = %s", group.getName());
             e.printStackTrace();
         }
     }
@@ -77,6 +81,7 @@ public class JdbcGroupDao implements GroupDao {
                 }
             });
         } catch (DataAccessException e) {
+            logger.info("Error insert list groups");
             e.printStackTrace();
         }
     }

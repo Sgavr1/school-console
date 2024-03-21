@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.entity.Course;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Repository
 public class JdbcCourseDao implements CourseDao {
+    private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(course_id) From courses;";
     private static final String QUERY_INSERT = "INSERT INTO courses(course_name, course_description) VALUES(?,?);";
     private static final String QUERY_SELECT_ALL = """
@@ -51,6 +54,7 @@ public class JdbcCourseDao implements CourseDao {
         try {
             template.update(QUERY_INSERT, course.getName(), course.getDescription());
         } catch (DataAccessException e) {
+            logger.info("Error insert course: name = %s description = %s", course.getName(), course.getDescription());
             e.printStackTrace();
         }
     }
@@ -73,6 +77,7 @@ public class JdbcCourseDao implements CourseDao {
             });
 
         } catch (DataAccessException e) {
+            logger.info("Error insert list courses");
             e.printStackTrace();
         }
     }
