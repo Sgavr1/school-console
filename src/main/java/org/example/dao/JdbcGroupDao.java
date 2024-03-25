@@ -61,7 +61,7 @@ public class JdbcGroupDao implements GroupDao {
         try {
             template.update(QUERY_INSERT, group.getName());
         } catch (DataAccessException e) {
-            logger.info("Error insert group: name = %s", group.getName());
+            logger.error("Error insert group: name = %s", group.getName());
             e.printStackTrace();
         }
     }
@@ -81,7 +81,7 @@ public class JdbcGroupDao implements GroupDao {
                 }
             });
         } catch (DataAccessException e) {
-            logger.info("Error insert list groups");
+            logger.error("Error insert list groups");
             e.printStackTrace();
         }
     }
@@ -104,6 +104,7 @@ public class JdbcGroupDao implements GroupDao {
             }
             return Optional.of(groups.get(0));
         } catch (EmptyResultDataAccessException e) {
+            logger.warn("Not found group by name = %s", name);
             return Optional.empty();
         }
     }

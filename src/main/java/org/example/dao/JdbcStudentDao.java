@@ -65,7 +65,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_INSERT, student.getFirstName(), student.getLastName(), student.getGroupId());
         } catch (DataAccessException e) {
-            logger.info("Error insert student: firstName = %s lastName = %s ", student.getFirstName(), student.getLastName());
+            logger.error("Error insert student: firstName = %s lastName = %s ", student.getFirstName(), student.getLastName());
             e.printStackTrace();
         }
     }
@@ -88,7 +88,7 @@ public class JdbcStudentDao implements StudentDao {
                 }
             });
         } catch (DataAccessException e) {
-            logger.info("Error insert list students");
+            logger.error("Error insert list students");
             e.printStackTrace();
         }
     }
@@ -102,6 +102,7 @@ public class JdbcStudentDao implements StudentDao {
             }
             return Optional.of(students.get(0));
         } catch (EmptyResultDataAccessException e) {
+            logger.warn("Not found student by id = %d", id);
             return Optional.empty();
         }
     }
@@ -115,7 +116,7 @@ public class JdbcStudentDao implements StudentDao {
             connection.commit();
             connection.setAutoCommit(true);
         } catch (DataAccessException | SQLException e) {
-            logger.info("Error delete student by id = %d", id);
+            logger.error("Error delete student by id = %d", id);
             e.printStackTrace();
         }
     }
@@ -125,7 +126,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID, id);
         } catch (DataAccessException e) {
-            logger.info("Error deleting student from all courses by id = %d", id);
+            logger.error("Error deleting student from all courses by id = %d", id);
             e.printStackTrace();
         }
     }
@@ -135,7 +136,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_DELETE_FROM_COURSE, studentId, courseId);
         } catch (DataAccessException e) {
-            logger.info("Error delete student from course: studentId = %d courseId = %d", studentId, courseId);
+            logger.error("Error delete student from course: studentId = %d courseId = %d", studentId, courseId);
             e.printStackTrace();
         }
     }
@@ -163,7 +164,7 @@ public class JdbcStudentDao implements StudentDao {
         try {
             template.update(QUERY_INSERT_STUDENT_COURSE, studentId, courseId);
         } catch (DataAccessException e) {
-            logger.info("Error insert student on course: studentId = %d courseId = %d", studentId, courseId);
+            logger.error("Error insert student on course: studentId = %d courseId = %d", studentId, courseId);
             e.printStackTrace();
         }
     }
@@ -184,7 +185,7 @@ public class JdbcStudentDao implements StudentDao {
                 }
             });
         } catch (DataAccessException e) {
-            logger.info("Error insert list students on courses");
+            logger.error("Error insert list students on courses");
             e.printStackTrace();
         }
     }

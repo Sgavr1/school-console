@@ -54,7 +54,7 @@ public class JdbcCourseDao implements CourseDao {
         try {
             template.update(QUERY_INSERT, course.getName(), course.getDescription());
         } catch (DataAccessException e) {
-            logger.info("Error insert course: name = %s description = %s", course.getName(), course.getDescription());
+            logger.error("Error insert course: name = %s description = %s", course.getName(), course.getDescription());
             e.printStackTrace();
         }
     }
@@ -77,7 +77,7 @@ public class JdbcCourseDao implements CourseDao {
             });
 
         } catch (DataAccessException e) {
-            logger.info("Error insert list courses");
+            logger.error("Error insert list courses");
             e.printStackTrace();
         }
     }
@@ -100,6 +100,7 @@ public class JdbcCourseDao implements CourseDao {
             }
             return Optional.of(courses.get(0));
         } catch (EmptyResultDataAccessException e) {
+            logger.warn("Not found course by name = %s", name);
             return Optional.empty();
         }
     }
