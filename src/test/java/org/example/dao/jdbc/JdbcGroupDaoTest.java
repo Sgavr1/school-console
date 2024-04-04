@@ -1,5 +1,6 @@
-package org.example.dao;
+package org.example.dao.jdbc;
 
+import org.example.dao.GroupDao;
 import org.example.entity.Group;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ComponentScan("org.example")
+@ComponentScan("org.example.configuration")
 @JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"/sql/clear_table.sql", "/sql/insert_table.sql"})

@@ -4,7 +4,10 @@ import org.example.configuration.MapperConfiguration;
 import org.example.dao.GroupDao;
 import org.example.dto.GroupDto;
 import org.example.entity.Group;
+import org.example.mapper.GroupMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +20,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {GroupService.class, MapperConfiguration.class})
+@SpringBootTest(classes = {MapperConfiguration.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GroupServiceTest {
 
     private static final String GROUP_NAME_1 = "AB-01";
@@ -25,7 +29,13 @@ public class GroupServiceTest {
     @MockBean
     private GroupDao groupDao;
     @Autowired
+    private GroupMapper mapper;
     private GroupService groupService;
+
+    @BeforeAll
+    public void init() {
+        groupService = new GroupService(groupDao, mapper);
+    }
 
     @Test
     public void shouldReturnGroupWhenCorrectGroupName() {

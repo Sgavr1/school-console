@@ -5,8 +5,12 @@ import org.example.dao.CourseDao;
 import org.example.dto.CourseDto;
 import org.example.dto.StudentDto;
 import org.example.entity.Course;
+import org.example.entity.Group;
 import org.example.entity.Student;
+import org.example.mapper.CourseMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +23,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {CourseService.class, MapperConfiguration.class})
+@SpringBootTest(classes = {MapperConfiguration.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CourseServiceTest {
 
     private static final String COURSE_NAME = "Вступ до програмування";
@@ -32,7 +37,13 @@ public class CourseServiceTest {
     @MockBean
     private CourseDao courseDao;
     @Autowired
+    private CourseMapper mapper;
     private CourseService courseService;
+
+    @BeforeAll
+    public void init() {
+        courseService = new CourseService(courseDao, mapper);
+    }
 
     @Test
     public void shouldReturnCourseWhenCorrectCourseName() {
@@ -78,14 +89,14 @@ public class CourseServiceTest {
         courses.add(course);
 
         Student student = new Student(1);
-        student.setGroupId(1);
+        student.setGroup(new Group(1));
         student.setFirstName(STUDENT_1_FIRST_NAME);
         student.setLastName(STUDENT_1_LAST_NAME);
 
         course.getStudents().add(student);
 
         student = new Student(2);
-        student.setGroupId(3);
+        student.setGroup(new Group(3));
         student.setFirstName(STUDENT_2_FIRST_NAME);
         student.setLastName(STUDENT_2_LAST_NAME);
 

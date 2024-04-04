@@ -3,8 +3,12 @@ package org.example.service;
 import org.example.configuration.MapperConfiguration;
 import org.example.dao.StudentDao;
 import org.example.dto.StudentDto;
+import org.example.entity.Group;
 import org.example.entity.Student;
+import org.example.mapper.StudentMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +21,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {StudentService.class, MapperConfiguration.class})
+@SpringBootTest(classes = {MapperConfiguration.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StudentServiceTest {
     private static final String STUDENT_1_FIRST_NAME = "Юлия";
     private static final String STUDENT_1_LAST_NAME = "Мельник";
@@ -27,7 +32,13 @@ public class StudentServiceTest {
     @MockBean
     private StudentDao studentDao;
     @Autowired
+    private StudentMapper mapper;
     private StudentService studentService;
+
+    @BeforeAll
+    public void init() {
+        studentService = new StudentService(studentDao, mapper);
+    }
 
     @Test
     public void shouldReturnStudentWhenCorrectStudentId() {
@@ -35,7 +46,7 @@ public class StudentServiceTest {
         student.setId(1);
         student.setFirstName(STUDENT_1_FIRST_NAME);
         student.setLastName(STUDENT_1_LAST_NAME);
-        student.setGroupId(1);
+        student.setGroup(new Group(1));
 
         Mockito.when(studentDao.getById(1)).thenReturn(Optional.of(student));
 
@@ -54,14 +65,14 @@ public class StudentServiceTest {
         List<Student> students = new ArrayList<>();
 
         Student student1 = new Student(1);
-        student1.setGroupId(4);
+        student1.setGroup(new Group(4));
         student1.setFirstName(STUDENT_1_FIRST_NAME);
         student1.setLastName(STUDENT_1_LAST_NAME);
 
         students.add(student1);
 
         Student student2 = new Student(2);
-        student2.setGroupId(7);
+        student2.setGroup(new Group(7));
         student2.setFirstName(STUDENT_2_FIRST_NAME);
         student2.setLastName(STUDENT_2_LAST_NAME);
 
@@ -79,12 +90,12 @@ public class StudentServiceTest {
         assertEquals(student1.getId(), responseStudent1.getId());
         assertEquals(student1.getFirstName(), responseStudent1.getFirstName());
         assertEquals(student1.getLastName(), responseStudent1.getLastName());
-        assertEquals(student1.getGroupId(), responseStudent1.getGroupId());
+        assertEquals(student1.getGroup().getId(), responseStudent1.getGroupId());
 
         assertEquals(student2.getId(), responseStudent2.getId());
         assertEquals(student2.getFirstName(), responseStudent2.getFirstName());
         assertEquals(student2.getLastName(), responseStudent2.getLastName());
-        assertEquals(student2.getGroupId(), responseStudent2.getGroupId());
+        assertEquals(student2.getGroup().getId(), responseStudent2.getGroupId());
     }
 
     @Test
@@ -134,13 +145,13 @@ public class StudentServiceTest {
     public void shouldReturnListAllStudents() {
         List<Student> students = new ArrayList<>();
         Student student1 = new Student(1);
-        student1.setGroupId(4);
+        student1.setGroup(new Group(4));
         student1.setFirstName(STUDENT_1_FIRST_NAME);
         student1.setLastName(STUDENT_2_LAST_NAME);
         students.add(student1);
 
         Student student2 = new Student(2);
-        student2.setGroupId(7);
+        student2.setGroup(new Group(7));
         student2.setFirstName(STUDENT_2_FIRST_NAME);
         student2.setLastName(STUDENT_2_LAST_NAME);
         students.add(student2);
@@ -157,12 +168,12 @@ public class StudentServiceTest {
         assertEquals(student1.getId(), responseStudent1.getId());
         assertEquals(student1.getFirstName(), responseStudent1.getFirstName());
         assertEquals(student1.getLastName(), responseStudent1.getLastName());
-        assertEquals(student1.getGroupId(), responseStudent1.getGroupId());
+        assertEquals(student1.getGroup().getId(), responseStudent1.getGroupId());
 
         assertEquals(student2.getId(), responseStudent2.getId());
         assertEquals(student2.getFirstName(), responseStudent2.getFirstName());
         assertEquals(student2.getLastName(), responseStudent2.getLastName());
-        assertEquals(student2.getGroupId(), responseStudent2.getGroupId());
+        assertEquals(student2.getGroup().getId(), responseStudent2.getGroupId());
 
     }
 }

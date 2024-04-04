@@ -1,30 +1,31 @@
-package org.example.dao;
+package org.example.dao.jpa;
 
+import org.example.dao.StudentDao;
+import org.example.entity.Group;
 import org.example.entity.Student;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-@ComponentScan("org.example")
-@JdbcTest
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        JPAStudentDao.class
+}))
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"/sql/clear_table.sql", "/sql/insert_table.sql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JdbcStudentDaoTest {
+public class JPAStudentDaoTest {
     private static final String INSERT_STUDENT_1_FIRST_NAME = "Юлия";
     private static final String INSERT_STUDENT_1_LAST_NAME = "Мельник";
     private static final String INSERT_STUDENT_2_FIRST_NAME = "Артем";
@@ -36,24 +37,19 @@ public class JdbcStudentDaoTest {
     private static final String COURSE_1_NAME = "Вступ до програмування";
     private static final String COURSE_2_NAME = "Математика для інформатики";
     @Autowired
-    private JdbcTemplate template;
-    @Autowired
-    private RowMapper<Student> studentMapper;
     private StudentDao studentDao;
     private Student student1;
     private Student student2;
 
     @BeforeAll
     public void init() {
-        studentDao = new JdbcStudentDao(template, studentMapper);
-
         student1 = new Student(3);
-        student1.setGroupId(1);
+        student1.setGroup(new Group(1));
         student1.setFirstName(INSERT_STUDENT_1_FIRST_NAME);
         student1.setLastName(INSERT_STUDENT_1_LAST_NAME);
 
         student2 = new Student(4);
-        student2.setGroupId(1);
+        student2.setGroup(new Group(1));
         student2.setFirstName(INSERT_STUDENT_2_FIRST_NAME);
         student2.setLastName(INSERT_STUDENT_2_LAST_NAME);
     }
@@ -92,12 +88,12 @@ public class JdbcStudentDaoTest {
 
         assertEquals(student1.getLastName(), responseStudent1.getLastName());
         assertEquals(student1.getFirstName(), responseStudent1.getFirstName());
-        assertEquals(student1.getGroupId(), responseStudent1.getGroupId());
+        assertEquals(student1.getGroup().getId(), responseStudent1.getGroup().getId());
         assertEquals(student1.getId(), responseStudent1.getId());
 
         assertEquals(student2.getLastName(), responseStudent2.getLastName());
         assertEquals(student2.getFirstName(), responseStudent2.getFirstName());
-        assertEquals(student2.getGroupId(), responseStudent2.getGroupId());
+        assertEquals(student2.getGroup().getId(), responseStudent2.getGroup().getId());
         assertEquals(student2.getId(), responseStudent2.getId());
 
     }
@@ -112,7 +108,7 @@ public class JdbcStudentDaoTest {
 
         assertEquals(STUDENT_BY_ID_1_LAST_NAME, responseStudent1.getLastName());
         assertEquals(STUDENT_BY_ID_1_FIRST_NAME, responseStudent1.getFirstName());
-        assertEquals(1, responseStudent1.getGroupId());
+        assertEquals(1, responseStudent1.getGroup().getId());
         assertEquals(1, responseStudent1.getId());
     }
 
@@ -160,12 +156,12 @@ public class JdbcStudentDaoTest {
         Student responseStudent2 = students.get(1);
 
         assertEquals(1, responseStudent1.getId());
-        assertEquals(1, responseStudent1.getGroupId());
+        assertEquals(1, responseStudent1.getGroup().getId());
         assertEquals(STUDENT_BY_ID_1_FIRST_NAME, responseStudent1.getFirstName());
         assertEquals(STUDENT_BY_ID_1_LAST_NAME, responseStudent1.getLastName());
 
         assertEquals(2, responseStudent2.getId());
-        assertEquals(1, responseStudent2.getGroupId());
+        assertEquals(1, responseStudent2.getGroup().getId());
         assertEquals(STUDENT_BY_ID_2_FIRST_NAME, responseStudent2.getFirstName());
         assertEquals(STUDENT_BY_ID_2_LAST_NAME, responseStudent2.getLastName());
     }
@@ -179,7 +175,7 @@ public class JdbcStudentDaoTest {
         Student student = students.get(0);
 
         assertEquals(1, student.getId());
-        assertEquals(1, student.getGroupId());
+        assertEquals(1, student.getGroup().getId());
         assertEquals(STUDENT_BY_ID_1_FIRST_NAME, student.getFirstName());
         assertEquals(STUDENT_BY_ID_1_LAST_NAME, student.getLastName());
     }
