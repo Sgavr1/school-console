@@ -1,14 +1,28 @@
 package org.example.entity;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "groups")
 public class Group {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "group_id")
     private int id;
+    @Column(name = "group_name")
     private String name;
+    @OneToMany(mappedBy = "group")
     private List<Student> students;
 
     public Group() {
+        students = new ArrayList<>();
+    }
+
+    public Group(int id) {
+        this.id = id;
         students = new ArrayList<>();
     }
 

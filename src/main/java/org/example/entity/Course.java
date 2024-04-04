@@ -1,12 +1,22 @@
 package org.example.entity;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "courses")
 public class Course {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "course_id")
     private int id;
+    @Column(name = "course_name")
     private String name;
+    @Column(name = "course_description")
     private String description;
+    @ManyToMany(mappedBy = "courses")
     private List<Student> students;
 
     public Course() {
