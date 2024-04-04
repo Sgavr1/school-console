@@ -1,5 +1,6 @@
-package org.example.dao;
+package org.example.dao.jdbc;
 
+import org.example.dao.CourseDao;
 import org.example.entity.Course;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("JDBCCourse")
 public class JdbcCourseDao implements CourseDao {
     private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(course_id) From courses;";

@@ -1,5 +1,6 @@
-package org.example.dao;
+package org.example.dao.jdbc;
 
+import org.example.dao.GroupDao;
 import org.example.entity.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("JDBCGroup")
 public class JdbcGroupDao implements GroupDao {
-    private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
+    private final Logger logger = LoggerFactory.getLogger(JdbcGroupDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(group_id) From groups;";
     private static final String QUERY_INSERT = "INSERT INTO groups(group_name) VALUES(?);";
     private static final String QUERY_SELECT_ALL = """

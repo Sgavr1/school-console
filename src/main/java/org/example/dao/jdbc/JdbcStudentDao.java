@@ -1,5 +1,6 @@
-package org.example.dao;
+package org.example.dao.jdbc;
 
+import org.example.dao.StudentDao;
 import org.example.entity.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("JDBCStudent")
 public class JdbcStudentDao implements StudentDao {
-    private final Logger logger = LoggerFactory.getLogger(JdbcCourseDao.class);
+    private final Logger logger = LoggerFactory.getLogger(JdbcStudentDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(student_id) From students;";
     private static final String QUERY_INSERT = "INSERT INTO students(first_name, last_name, group_id) VALUES (?, ?, ?)";
     private static final String QUERY_INSERT_STUDENT_COURSE = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?);";
@@ -63,7 +64,7 @@ public class JdbcStudentDao implements StudentDao {
     @Override
     public void insert(Student student) {
         try {
-            template.update(QUERY_INSERT, student.getFirstName(), student.getLastName(), student.getGroupId());
+            template.update(QUERY_INSERT, student.getFirstName(), student.getLastName(), student.getGroup().getId());
         } catch (DataAccessException e) {
             logger.error("Error insert student: firstName = %s lastName = %s ", student.getFirstName(), student.getLastName());
             e.printStackTrace();
@@ -79,7 +80,7 @@ public class JdbcStudentDao implements StudentDao {
                     Student student = students.get(i);
                     ps.setString(1, student.getFirstName());
                     ps.setString(2, student.getLastName());
-                    ps.setInt(3, student.getGroupId());
+                    ps.setInt(3, student.getGroup().getId());
                 }
 
                 @Override

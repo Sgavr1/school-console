@@ -1,6 +1,7 @@
 package org.example.dao.mapper;
 
 import org.example.entity.Course;
+import org.example.entity.Group;
 import org.example.entity.Student;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -23,7 +24,7 @@ public class StudentRowMapper implements RowMapper<Student> {
         }
         student.setId(rs.getInt("student_id"));
         student.setLastName(rs.getString("last_name"));
-        student.setGroupId(rs.getInt("group_id"));
+        student.setGroup(new Group(rs.getInt("group_id")));
 
         if (courseMapper != null) {
             Course course = courseMapper.mapRow(rs, rowNum);
