@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.dao.GroupDao;
 import org.example.dto.GroupDto;
 import org.example.mapper.GroupMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class GroupService {
     private final GroupDao groupDao;
     private final GroupMapper groupMapper;
 
-    public GroupService(@Qualifier("JPAGroup") GroupDao groupDao, GroupMapper groupMapper) {
+    public GroupService(GroupDao groupDao, GroupMapper groupMapper) {
         this.groupDao = groupDao;
         this.groupMapper = groupMapper;
     }

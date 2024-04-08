@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.dao.CourseDao;
 import org.example.dto.CourseDto;
 import org.example.mapper.CourseMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class CourseService {
     private final CourseDao courseDao;
     private final CourseMapper courseMapper;
 
-    public CourseService(@Qualifier("JPACourse") CourseDao courseDao, CourseMapper courseMapper) {
+    public CourseService(CourseDao courseDao, CourseMapper courseMapper) {
         this.courseDao = courseDao;
         this.courseMapper = courseMapper;
     }

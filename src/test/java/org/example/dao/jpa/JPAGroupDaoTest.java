@@ -56,7 +56,9 @@ public class JPAGroupDaoTest {
 
         List<Group> groups = groupDao.getAll();
 
-        assertEquals(true, groups.stream().filter(g -> g.getName().equals(group1.getName())).findFirst().isPresent());
+        boolean presentGroup = groups.stream().filter(g -> g.getName().equals(group1.getName())).findFirst().isPresent();
+
+        assertTrue(presentGroup);
     }
 
     @Test
@@ -69,23 +71,29 @@ public class JPAGroupDaoTest {
 
         List<Group> responseGroups = groupDao.getAll();
 
-        assertEquals(true, responseGroups.stream().filter(g -> g.getName().equals(group1.getName())).findFirst().isPresent());
-        assertEquals(true, responseGroups.stream().filter(g -> g.getName().equals(group2.getName())).findFirst().isPresent());
+        boolean presentGroup1 = responseGroups.stream().filter(g -> g.getName().equals(group1.getName())).findFirst().isPresent();
+        boolean presentGroup2 = responseGroups.stream().filter(g -> g.getName().equals(group2.getName())).findFirst().isPresent();
+
+        assertTrue(presentGroup1);
+        assertTrue(presentGroup2);
     }
 
     @Test
     public void shouldGetAll() {
         List<Group> responseGroups = groupDao.getAll();
 
-        assertEquals(true, responseGroups.stream().filter(g -> g.getName().equals(GROUP_BY_ID_1_NAME)).findFirst().isPresent());
-        assertEquals(true, responseGroups.stream().filter(g -> g.getName().equals(GROUP_BY_ID_2_NAME)).findFirst().isPresent());
+        boolean presentGroup1 = responseGroups.stream().filter(g -> g.getName().equals(GROUP_BY_ID_1_NAME)).findFirst().isPresent();
+        boolean presentGroup2 = responseGroups.stream().filter(g -> g.getName().equals(GROUP_BY_ID_2_NAME)).findFirst().isPresent();
+
+        assertTrue(presentGroup1);
+        assertTrue(presentGroup2);
     }
 
     @Test
     public void shouldGetGroupByName() {
         Optional<Group> optionalGroup = groupDao.getGroupByName(GROUP_BY_ID_1_NAME);
 
-        assertEquals(true, optionalGroup.isPresent());
+        assertTrue(optionalGroup.isPresent());
 
         Group group = optionalGroup.get();
 

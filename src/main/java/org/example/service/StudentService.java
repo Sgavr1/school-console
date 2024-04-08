@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.dao.StudentDao;
 import org.example.dto.StudentDto;
 import org.example.mapper.StudentMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class StudentService {
     private final StudentDao studentDao;
     private final StudentMapper studentMapper;
 
-    public StudentService(@Qualifier("JPAStudent") StudentDao studentDao, StudentMapper studentMapper) {
+    public StudentService(StudentDao studentDao, StudentMapper studentMapper) {
         this.studentDao = studentDao;
         this.studentMapper = studentMapper;
     }

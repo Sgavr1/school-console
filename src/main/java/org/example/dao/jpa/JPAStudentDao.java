@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("JPAStudent")
+@Repository
 public class JPAStudentDao implements StudentDao {
     private final Logger logger = LoggerFactory.getLogger(JPAStudentDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(s) From Student s";
@@ -42,7 +42,8 @@ public class JPAStudentDao implements StudentDao {
         try {
             em.merge(student);
         } catch (PersistenceException e) {
-            logger.error(String.format("Error insert student: firstName = %s lastName = %s ", student.getFirstName(), student.getLastName()));
+            logger.error(String.format("Error insert student: firstName = %s lastName = %s : {}",
+                    student.getFirstName(), student.getLastName()), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -55,7 +56,7 @@ public class JPAStudentDao implements StudentDao {
             }
             em.flush();
         } catch (PersistenceException e) {
-            logger.error("Error insert list students");
+            logger.error("Error insert list students: {}", e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -72,10 +73,13 @@ public class JPAStudentDao implements StudentDao {
     @Override
     public void delete(int id) {
         try {
-            em.createNativeQuery(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID).setParameter(1, id).executeUpdate();
+            em.createNativeQuery(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID)
+                    .setParameter(1, id)
+                    .executeUpdate();
+
             em.createQuery(QUERY_DELETE_BY_ID).setParameter(1, id).executeUpdate();
         } catch (PersistenceException e) {
-            logger.error(String.format("Error delete student by id = %d", id));
+            logger.error(String.format("Error delete student by id = %d : {}", id), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -83,9 +87,11 @@ public class JPAStudentDao implements StudentDao {
     @Override
     public void deleteFromAllCoursesByStudentId(int id) {
         try {
-            em.createNativeQuery(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID).setParameter(1, id).executeUpdate();
+            em.createNativeQuery(QUERY_DELETE_FROM_ALL_COURSES_BY_STUDENT_ID)
+                    .setParameter(1, id)
+                    .executeUpdate();
         } catch (PersistenceException e) {
-            logger.error(String.format("Error deleting student from all courses by id = %d", id));
+            logger.error(String.format("Error deleting student from all courses by id = %d : {}", id), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -98,8 +104,8 @@ public class JPAStudentDao implements StudentDao {
                     .setParameter(2, courseId)
                     .executeUpdate();
         } catch (PersistenceException e) {
-            logger.error(String.format("Error delete student from course: studentId = %d courseId = %d",
-                    studentId, courseId));
+            logger.error(String.format("Error delete student from course: studentId = %d courseId = %d : {}",
+                    studentId, courseId), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -111,7 +117,9 @@ public class JPAStudentDao implements StudentDao {
 
     @Override
     public List<Student> getStudentsByCourseName(String courseName) {
-        return em.createQuery(QUERY_SELECT_ALL_BY_COURSE_NAME).setParameter(1, courseName).getResultList();
+        return em.createQuery(QUERY_SELECT_ALL_BY_COURSE_NAME)
+                .setParameter(1, courseName)
+                .getResultList();
     }
 
     @Override
@@ -122,8 +130,8 @@ public class JPAStudentDao implements StudentDao {
                     .setParameter(2, courseId)
                     .executeUpdate();
         } catch (PersistenceException e) {
-            logger.error(String.format("Error insert student on course: studentId = %d courseId = %d",
-                    studentId, courseId));
+            logger.error(String.format("Error insert student on course: studentId = %d courseId = %d : {}",
+                    studentId, courseId), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -139,7 +147,7 @@ public class JPAStudentDao implements StudentDao {
             }
             em.flush();
         } catch (PersistenceException e) {
-            logger.error("Error insert list students on courses");
+            logger.error("Error insert list students on courses : {}", e.getMessage(), e);
             e.printStackTrace();
         }
     }

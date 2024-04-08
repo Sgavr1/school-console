@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("JPACourse")
+@Repository
 public class JPACourseDao implements CourseDao {
     private final Logger logger = LoggerFactory.getLogger(JPACourseDao.class);
     private static final String QUERY_CHECK_EMPTY_TABLE = "Select count(c) From Course c";
@@ -38,7 +38,8 @@ public class JPACourseDao implements CourseDao {
         try {
             em.merge(course);
         } catch (PersistenceException e) {
-            logger.error(String.format("Error insert course: name = %s description = %s", course.getName(), course.getDescription()));
+            logger.error(String.format("Error insert course: name = %s description = %s : {}",
+                    course.getName(), course.getDescription()), e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -51,7 +52,7 @@ public class JPACourseDao implements CourseDao {
             }
             em.flush();
         } catch (PersistenceException e) {
-            logger.error("Error insert list courses");
+            logger.error("Error insert list courses: {}", e.getMessage(), e);
             e.printStackTrace();
         }
     }
@@ -64,7 +65,10 @@ public class JPACourseDao implements CourseDao {
     @Override
     public Optional<Course> getByName(String name) {
         try {
-            Course course = em.createQuery(QUERY_SELECT_BY_NAME, Course.class).setParameter(1, name).getSingleResult();
+            Course course = em.createQuery(QUERY_SELECT_BY_NAME, Course.class)
+                    .setParameter(1, name)
+                    .getSingleResult();
+
             return Optional.ofNullable(course);
         } catch (PersistenceException e) {
             logger.warn(String.format("Not found course by name = %s", name));
@@ -74,7 +78,9 @@ public class JPACourseDao implements CourseDao {
 
     @Override
     public List<Course> getCoursesByStudentId(int studentId) {
-        return em.createQuery(QUERY_SELECT_ALL_BY_STUDENT_ID, Course.class).setParameter(1, studentId).getResultList();
+        return em.createQuery(QUERY_SELECT_ALL_BY_STUDENT_ID, Course.class)
+                .setParameter(1, studentId)
+                .getResultList();
     }
 
     @Override

@@ -56,7 +56,7 @@ public class JPACourseDaoTest {
 
         Optional<Course> optionalCourse = courseDao.getByName(INSERT_COURSE_1_NAME);
 
-        assertEquals(true, optionalCourse.isPresent());
+        assertTrue(optionalCourse.isPresent());
 
         Course responseCourse = optionalCourse.get();
 
@@ -74,24 +74,31 @@ public class JPACourseDaoTest {
 
         List<Course> responseCourse = courseDao.getAll();
 
-        assertEquals(true, responseCourse.stream().filter(c -> c.getName().equals(course1.getName())).findFirst().isPresent());
-        assertEquals(true, responseCourse.stream().filter(c -> c.getName().equals(course2.getName())).findFirst().isPresent());
+        boolean presentCourse1 = responseCourse.stream().filter(c -> c.getName().equals(course1.getName())).findFirst().isPresent();
+        boolean presentCourse2 = responseCourse.stream().filter(c -> c.getName().equals(course2.getName())).findFirst().isPresent();
+
+        assertTrue(presentCourse1);
+        assertTrue(presentCourse2);
     }
 
     @Test
     public void shouldGetAll() {
         List<Course> responseCourse = courseDao.getAll();
 
-        assertEquals(true, responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_1_NAME)).findFirst().isPresent());
-        assertEquals(true, responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_2_NAME)).findFirst().isPresent());
-        assertEquals(true, responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_3_NAME)).findFirst().isPresent());
+        boolean presentCourse1 = responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_1_NAME)).findFirst().isPresent();
+        boolean presentCourse2 = responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_2_NAME)).findFirst().isPresent();
+        boolean presentCourse3 = responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_3_NAME)).findFirst().isPresent();
+
+        assertTrue(presentCourse1);
+        assertTrue(presentCourse2);
+        assertTrue(presentCourse3);
     }
 
     @Test
     public void shouldGetByName() {
         Optional<Course> optionalCourse = courseDao.getByName(COURSE_BY_ID_1_NAME);
 
-        assertEquals(true, optionalCourse.isPresent());
+        assertTrue(optionalCourse.isPresent());
 
         Course course = optionalCourse.get();
 

@@ -1,19 +1,14 @@
 package org.example.mapper;
 
 import org.example.dto.CourseDto;
-import org.example.dto.StudentDto;
 import org.example.entity.Course;
-import org.example.entity.Student;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
-@Mapper
+@Mapper(componentModel = "spring", uses = {StudentMapperIgnoreCourse.class})
 public interface CourseMapper {
+    @Mapping(source = "students", target = "students", qualifiedByName = "mapStudentsDto")
     CourseDto toDto(Course course);
 
+    @Mapping(source = "students", target = "students", qualifiedByName = "mapStudents")
     Course toEntity(CourseDto courseDto);
-
-    @Mapping(target = "courses", ignore = true)
-    @Mapping(source = "group.id", target = "groupId")
-    StudentDto toStudentDto(Student student);
 }

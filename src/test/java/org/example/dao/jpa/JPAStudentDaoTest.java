@@ -60,7 +60,7 @@ public class JPAStudentDaoTest {
 
         Optional<Student> optionalStudent = studentDao.getById(student1.getId());
 
-        assertEquals(true, optionalStudent.isPresent());
+        assertTrue(optionalStudent.isPresent());
 
         Student insertStudent = optionalStudent.get();
 
@@ -80,8 +80,8 @@ public class JPAStudentDaoTest {
         Optional<Student> optionalStudent1 = studentDao.getById(student1.getId());
         Optional<Student> optionalStudent2 = studentDao.getById(student2.getId());
 
-        assertEquals(true, optionalStudent1.isPresent());
-        assertEquals(true, optionalStudent2.isPresent());
+        assertTrue(optionalStudent1.isPresent());
+        assertTrue(optionalStudent2.isPresent());
 
         Student responseStudent1 = optionalStudent1.get();
         Student responseStudent2 = optionalStudent2.get();
@@ -102,7 +102,7 @@ public class JPAStudentDaoTest {
     public void shouldGetById() {
         Optional<Student> optionalStudent = studentDao.getById(1);
 
-        assertEquals(true, optionalStudent.isPresent());
+        assertTrue(optionalStudent.isPresent());
 
         Student responseStudent1 = optionalStudent.get();
 
@@ -116,7 +116,7 @@ public class JPAStudentDaoTest {
     public void shouldDeleteById() {
         studentDao.delete(1);
         Optional<Student> optionalStudent = studentDao.getById(1);
-        assertEquals(false, optionalStudent.isPresent());
+        assertFalse(optionalStudent.isPresent());
     }
 
     @Test
@@ -125,11 +125,11 @@ public class JPAStudentDaoTest {
 
         Optional<Student> optionalStudent = studentDao.getById(1);
 
-        assertEquals(true, optionalStudent.isPresent());
+        assertTrue(optionalStudent.isPresent());
 
         Student responseStudent = optionalStudent.get();
 
-        assertEquals(true, responseStudent.getCourses().isEmpty());
+        assertTrue(responseStudent.getCourses().isEmpty());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class JPAStudentDaoTest {
 
         Optional<Student> optionalStudent = studentDao.getById(1);
 
-        assertEquals(true, optionalStudent.isPresent());
+        assertTrue(optionalStudent.isPresent());
 
         Student responseStudent = optionalStudent.get();
 
@@ -186,7 +186,7 @@ public class JPAStudentDaoTest {
 
         Optional<Student> optionalStudent = studentDao.getById(2);
 
-        assertEquals(true, optionalStudent.isPresent());
+        assertTrue(optionalStudent.isPresent());
 
         Student responseStudent = optionalStudent.get();
 
@@ -208,8 +208,10 @@ public class JPAStudentDaoTest {
 
         assertEquals(2, responseStudents.size());
 
-        assertEquals(true, students.stream().filter(s -> s.getId() == student1.getId()).findFirst().isPresent());
-        assertEquals(true, students.stream().filter(s -> s.getId() == student2.getId()).findFirst().isPresent());
+        boolean presentStudent1 = students.stream().filter(s -> s.getId() == student1.getId()).findFirst().isPresent();
+        boolean presentStudent2 = students.stream().filter(s -> s.getId() == student2.getId()).findFirst().isPresent();
 
+        assertTrue(presentStudent1);
+        assertTrue(presentStudent2);
     }
 }
