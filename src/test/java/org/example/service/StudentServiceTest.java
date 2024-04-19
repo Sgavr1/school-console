@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,11 +49,11 @@ public class StudentServiceTest {
         student.setLastName(STUDENT_1_LAST_NAME);
         student.setGroup(new Group(1));
 
-        Mockito.when(studentDao.getById(1)).thenReturn(Optional.of(student));
+        Mockito.when(studentDao.findById(1)).thenReturn(Optional.of(student));
 
         StudentDto response = studentService.getStudentById(1);
 
-        verify(studentDao).getById(1);
+        verify(studentDao).findById(1);
 
         assertEquals(1, response.getId());
         assertEquals(1, response.getGroupId());
@@ -78,11 +79,19 @@ public class StudentServiceTest {
 
         students.add(student2);
 
-        Mockito.when(studentDao.getStudentsByCourseName(COURSE_NAME)).thenReturn(students);
+        try {
+            Mockito.when(studentDao.findAllStudentByCourseName(COURSE_NAME)).thenReturn(students);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<StudentDto> responses = studentService.getStudentsByCourseName(COURSE_NAME);
 
-        verify(studentDao).getStudentsByCourseName(COURSE_NAME);
+        try {
+            verify(studentDao).findAllStudentByCourseName(COURSE_NAME);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         StudentDto responseStudent1 = responses.get(0);
         StudentDto responseStudent2 = responses.get(1);
@@ -104,7 +113,7 @@ public class StudentServiceTest {
 
         studentService.addStudent(student);
 
-        verify(studentDao).insert(any(Student.class));
+        verify(studentDao).save(any(Student.class));
     }
 
     @Test
@@ -113,23 +122,32 @@ public class StudentServiceTest {
 
         studentService.addStudents(students);
 
-        verify(studentDao).insertList(anyList());
+        verify(studentDao).saveAll(anyList());
     }
 
     @Test
     public void shouldAddStudentToCourse() {
         studentService.addStudentToCourse(1, 1);
 
-        verify(studentDao).insertStudentToCourse(1, 1);
+        try {
+            verify(studentDao).saveStudentOnCourse(1, 1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void shouldAddStudentsToCourse() {
         List<StudentDto> students = new ArrayList<>();
+        students.add(StudentDto.builder().build());
 
         studentService.addStudentsToCourse(1, students);
 
-        verify(studentDao).insertListStudentsOnCourse(anyInt(), anyList());
+        try {
+            verify(studentDao).saveStudentOnCourse(anyInt(), anyInt());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -138,7 +156,7 @@ public class StudentServiceTest {
 
         studentService.delete(student);
 
-        verify(studentDao).delete(1);
+        verify(studentDao).deleteById(any());
     }
 
     @Test
@@ -156,11 +174,11 @@ public class StudentServiceTest {
         student2.setLastName(STUDENT_2_LAST_NAME);
         students.add(student2);
 
-        Mockito.when(studentDao.getAll()).thenReturn(students);
+        Mockito.when(studentDao.findAll()).thenReturn(students);
 
         List<StudentDto> responses = studentService.getStudents();
 
-        verify(studentDao).getAll();
+        verify(studentDao).findAll();
 
         StudentDto responseStudent1 = responses.get(0);
         StudentDto responseStudent2 = responses.get(1);

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
@@ -51,11 +52,19 @@ public class CourseServiceTest {
         correctCourse.setName(COURSE_NAME);
         correctCourse.setDescription(COURSE_DESCRIPTION);
 
-        when(courseDao.getByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
+        try {
+            when(courseDao.findByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         CourseDto response = courseService.getCourseByName(COURSE_NAME);
 
-        verify(courseDao).getByName(COURSE_NAME);
+        try {
+            verify(courseDao).findByName(COURSE_NAME);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         assertEquals(correctCourse.getName(), response.getName());
         assertEquals(correctCourse.getDescription(), response.getDescription());
@@ -67,7 +76,7 @@ public class CourseServiceTest {
 
         courseService.addCourse(course);
 
-        verify(courseDao).insert(any(Course.class));
+        verify(courseDao).save(any(Course.class));
     }
 
     @Test
@@ -76,7 +85,7 @@ public class CourseServiceTest {
 
         courseService.addCourses(courses);
 
-        verify(courseDao).insertList(anyList());
+        verify(courseDao).saveAll(anyList());
     }
 
     @Test
@@ -102,7 +111,7 @@ public class CourseServiceTest {
 
         course.getStudents().add(student);
 
-        Mockito.when(courseDao.getAll()).thenReturn(courses);
+        Mockito.when(courseDao.findAll()).thenReturn(courses);
 
         List<CourseDto> response = courseService.getAllCourses();
 
@@ -110,7 +119,7 @@ public class CourseServiceTest {
         StudentDto responseStudent1 = responseCourse.getStudents().get(0);
         StudentDto responseStudent2 = responseCourse.getStudents().get(1);
 
-        verify(courseDao).getAll();
+        verify(courseDao).findAll();
 
         assertEquals(COURSE_NAME, responseCourse.getName());
         assertEquals(COURSE_DESCRIPTION, responseCourse.getDescription());

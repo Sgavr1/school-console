@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,11 +44,19 @@ public class GroupServiceTest {
         group.setId(1);
         group.setName(GROUP_NAME_1);
 
-        when(groupDao.getGroupByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
+        try {
+            when(groupDao.findByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         GroupDto response = groupService.getGroupByName(GROUP_NAME_1);
 
-        verify(groupDao).getGroupByName(GROUP_NAME_1);
+        try {
+            verify(groupDao).findByName(GROUP_NAME_1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         assertEquals(GROUP_NAME_1, response.getName());
         assertEquals(group.getId(), response.getId());
@@ -66,11 +75,19 @@ public class GroupServiceTest {
         group.setName(GROUP_NAME_2);
         groups.add(group);
 
-        Mockito.when(groupDao.getGroupLessOrEqualsStudents(5)).thenReturn(groups);
+        try {
+            Mockito.when(groupDao.findGroupLessOrEqualsStudents(5)).thenReturn(groups);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         List<GroupDto> response = groupService.getGroupsLessOrEqualsStudents(5);
 
-        verify(groupDao).getGroupLessOrEqualsStudents(5);
+        try {
+            verify(groupDao).findGroupLessOrEqualsStudents(5);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         GroupDto responseGroup1 = response.get(0);
         GroupDto responseGroup2 = response.get(1);
@@ -87,7 +104,7 @@ public class GroupServiceTest {
 
         groupService.addGroup(group);
 
-        verify(groupDao).insert(any(Group.class));
+        verify(groupDao).save(any(Group.class));
 
     }
 
@@ -97,7 +114,7 @@ public class GroupServiceTest {
 
         groupService.addGroups(groups);
 
-        verify(groupDao).insertList(anyList());
+        verify(groupDao).saveAll(anyList());
     }
 
     @Test
@@ -113,11 +130,11 @@ public class GroupServiceTest {
 
         groups.add(group);
 
-        Mockito.when(groupDao.getAll()).thenReturn(groups);
+        Mockito.when(groupDao.findAll()).thenReturn(groups);
 
         List<GroupDto> response = groupService.getGroups();
 
-        verify(groupDao).getAll();
+        verify(groupDao).findAll();
 
         GroupDto responseGroup1 = response.get(0);
         GroupDto responseGroup2 = response.get(1);

@@ -1,4 +1,4 @@
-package org.example.dao.jpa;
+package org.example.dao;
 
 import org.example.dao.CourseDao;
 import org.example.entity.Course;
@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +20,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-        JPACourseDao.class
+        CourseDao.class
 }))
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"/sql/clear_table.sql", "/sql/insert_table.sql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JPACourseDaoTest {
+public class CourseDaoTest {
     private static final String INSERT_COURSE_1_NAME = "Мобільна розробка";
     private static final String INSERT_COURSE_1_DESCRIPTION = "Створення мобільних додатків для Android та iOS.";
     private static final String INSERT_COURSE_2_NAME = "Алгоритми та структури даних";
@@ -52,16 +53,20 @@ public class JPACourseDaoTest {
 
     @Test
     public void shouldInsert() {
-        courseDao.insert(course1);
+        courseDao.save(course1);
 
-        Optional<Course> optionalCourse = courseDao.getByName(INSERT_COURSE_1_NAME);
+        try {
+            Optional<Course> optionalCourse = courseDao.findByName(INSERT_COURSE_1_NAME);
 
-        assertTrue(optionalCourse.isPresent());
+            assertTrue(optionalCourse.isPresent());
 
-        Course responseCourse = optionalCourse.get();
+            Course responseCourse = optionalCourse.get();
 
-        assertEquals(INSERT_COURSE_1_NAME, course1.getName());
-        assertEquals(INSERT_COURSE_1_DESCRIPTION, course1.getDescription());
+            assertEquals(INSERT_COURSE_1_NAME, course1.getName());
+            assertEquals(INSERT_COURSE_1_DESCRIPTION, course1.getDescription());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -70,9 +75,9 @@ public class JPACourseDaoTest {
         courses.add(course1);
         courses.add(course2);
 
-        courseDao.insertList(courses);
+        courseDao.saveAll(courses);
 
-        List<Course> responseCourse = courseDao.getAll();
+        List<Course> responseCourse = courseDao.findAll();
 
         boolean presentCourse1 = responseCourse.stream().filter(c -> c.getName().equals(course1.getName())).findFirst().isPresent();
         boolean presentCourse2 = responseCourse.stream().filter(c -> c.getName().equals(course2.getName())).findFirst().isPresent();
@@ -83,7 +88,7 @@ public class JPACourseDaoTest {
 
     @Test
     public void shouldGetAll() {
-        List<Course> responseCourse = courseDao.getAll();
+        List<Course> responseCourse = courseDao.findAll();
 
         boolean presentCourse1 = responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_1_NAME)).findFirst().isPresent();
         boolean presentCourse2 = responseCourse.stream().filter(c -> c.getName().equals(COURSE_BY_ID_2_NAME)).findFirst().isPresent();
@@ -96,25 +101,35 @@ public class JPACourseDaoTest {
 
     @Test
     public void shouldGetByName() {
-        Optional<Course> optionalCourse = courseDao.getByName(COURSE_BY_ID_1_NAME);
+        try {
+            Optional<Course> optionalCourse = courseDao.findByName(COURSE_BY_ID_1_NAME);
 
-        assertTrue(optionalCourse.isPresent());
+            assertTrue(optionalCourse.isPresent());
 
-        Course course = optionalCourse.get();
+            Course course = optionalCourse.get();
 
-        assertEquals(COURSE_BY_ID_1_NAME, course.getName());
-        assertEquals(COURSE_BY_ID_1_DESCRIPTION, course.getDescription());
+            assertEquals(COURSE_BY_ID_1_NAME, course.getName());
+            assertEquals(COURSE_BY_ID_1_DESCRIPTION, course.getDescription());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void shouldGetCoursesByStudentId() {
-        List<Course> courses = courseDao.getCoursesByStudentId(2);
+        try {
+            List<Course> courses = courseDao.findAllCourseByStudentId(2);
 
-        assertEquals(1, courses.size());
+            assertEquals(1, courses.size());
 
-        Course course = courses.get(0);
+            Course course = courses.get(0);
 
-        assertEquals(COURSE_BY_ID_2_NAME, course.getName());
-        assertEquals(COURSE_BY_ID_2_DESCRIPTION, course.getDescription());
+            assertEquals(COURSE_BY_ID_2_NAME, course.getName());
+            assertEquals(COURSE_BY_ID_2_DESCRIPTION, course.getDescription());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 }

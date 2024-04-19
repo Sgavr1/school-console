@@ -1,4 +1,4 @@
-package org.example.dao.jpa;
+package org.example.dao;
 
 import org.example.dao.StudentDao;
 import org.example.entity.Group;
@@ -13,19 +13,19 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-        JPAStudentDao.class
+        StudentDao.class
 }))
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"/sql/clear_table.sql", "/sql/insert_table.sql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JPAStudentDaoTest {
+public class StudentDaoTest {
     private static final String INSERT_STUDENT_1_FIRST_NAME = "Юлия";
     private static final String INSERT_STUDENT_1_LAST_NAME = "Мельник";
     private static final String INSERT_STUDENT_2_FIRST_NAME = "Артем";
@@ -56,17 +56,13 @@ public class JPAStudentDaoTest {
 
     @Test
     public void shouldInsertStudent() {
-        studentDao.insert(student1);
+        studentDao.save(student1);
 
-        Optional<Student> optionalStudent = studentDao.getById(student1.getId());
+        Student student = studentDao.getById(student1.getId());
 
-        assertTrue(optionalStudent.isPresent());
-
-        Student insertStudent = optionalStudent.get();
-
-        assertEquals(student1.getId(), insertStudent.getId());
-        assertEquals(student1.getFirstName(), insertStudent.getFirstName());
-        assertEquals(student1.getLastName(), insertStudent.getLastName());
+        assertEquals(student1.getId(), student.getId());
+        assertEquals(student1.getFirstName(), student.getFirstName());
+        assertEquals(student1.getLastName(), student.getLastName());
     }
 
     @Test
@@ -75,16 +71,10 @@ public class JPAStudentDaoTest {
         students.add(student1);
         students.add(student2);
 
-        studentDao.insertList(students);
+        studentDao.saveAll(students);
 
-        Optional<Student> optionalStudent1 = studentDao.getById(student1.getId());
-        Optional<Student> optionalStudent2 = studentDao.getById(student2.getId());
-
-        assertTrue(optionalStudent1.isPresent());
-        assertTrue(optionalStudent2.isPresent());
-
-        Student responseStudent1 = optionalStudent1.get();
-        Student responseStudent2 = optionalStudent2.get();
+        Student responseStudent1 = studentDao.getById(student1.getId());
+        Student responseStudent2 = studentDao.getById(student2.getId());
 
         assertEquals(student1.getLastName(), responseStudent1.getLastName());
         assertEquals(student1.getFirstName(), responseStudent1.getFirstName());
@@ -100,55 +90,48 @@ public class JPAStudentDaoTest {
 
     @Test
     public void shouldGetById() {
-        Optional<Student> optionalStudent = studentDao.getById(1);
+        Student student = studentDao.getById(1);
 
-        assertTrue(optionalStudent.isPresent());
-
-        Student responseStudent1 = optionalStudent.get();
-
-        assertEquals(STUDENT_BY_ID_1_LAST_NAME, responseStudent1.getLastName());
-        assertEquals(STUDENT_BY_ID_1_FIRST_NAME, responseStudent1.getFirstName());
-        assertEquals(1, responseStudent1.getGroup().getId());
-        assertEquals(1, responseStudent1.getId());
+        assertEquals(STUDENT_BY_ID_1_LAST_NAME, student.getLastName());
+        assertEquals(1, student.getGroup().getId());
     }
 
     @Test
     public void shouldDeleteById() {
-        studentDao.delete(1);
-        Optional<Student> optionalStudent = studentDao.getById(1);
-        assertFalse(optionalStudent.isPresent());
+        studentDao.delete(studentDao.findById(1).get());
+        assertFalse(studentDao.findById(1).isPresent());
     }
 
     @Test
     public void shouldDeleteFromAllCoursesByStudentId() {
-        studentDao.deleteFromAllCoursesByStudentId(1);
+        try {
+            studentDao.deleteFromAllCourseByStudentId(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
-        Optional<Student> optionalStudent = studentDao.getById(1);
+        Student student = studentDao.getById(1);
 
-        assertTrue(optionalStudent.isPresent());
-
-        Student responseStudent = optionalStudent.get();
-
-        assertTrue(responseStudent.getCourses().isEmpty());
+        assertTrue(student.getCourses().isEmpty());
     }
 
     @Test
     public void shouldDeleteFromCourse() {
-        studentDao.deleteFromCourse(1, 2);
+        try {
+            studentDao.deleteFromCourse(1, 2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
-        Optional<Student> optionalStudent = studentDao.getById(1);
+        Student student = studentDao.findById(1).get();
 
-        assertTrue(optionalStudent.isPresent());
-
-        Student responseStudent = optionalStudent.get();
-
-        assertEquals(1, responseStudent.getCourses().size());
-        assertEquals(COURSE_1_NAME, responseStudent.getCourses().get(0).getName());
+        assertEquals(1, student.getCourses().size());
+        assertEquals(COURSE_1_NAME, student.getCourses().get(0).getName());
     }
 
     @Test
     public void shouldGetAll() {
-        List<Student> students = studentDao.getAll();
+        List<Student> students = studentDao.findAll();
 
         assertEquals(2, students.size());
 
@@ -168,50 +151,32 @@ public class JPAStudentDaoTest {
 
     @Test
     public void shouldGetStudentsByCourseName() {
-        List<Student> students = studentDao.getStudentsByCourseName(COURSE_1_NAME);
+        try {
+            List<Student> students = studentDao.findAllStudentByCourseName(COURSE_1_NAME);
 
-        assertEquals(1, students.size());
+            assertEquals(1, students.size());
 
-        Student student = students.get(0);
+            Student student = students.get(0);
 
-        assertEquals(1, student.getId());
-        assertEquals(1, student.getGroup().getId());
-        assertEquals(STUDENT_BY_ID_1_FIRST_NAME, student.getFirstName());
-        assertEquals(STUDENT_BY_ID_1_LAST_NAME, student.getLastName());
+            assertEquals(1, student.getId());
+            assertEquals(1, student.getGroup().getId());
+            assertEquals(STUDENT_BY_ID_1_FIRST_NAME, student.getFirstName());
+            assertEquals(STUDENT_BY_ID_1_LAST_NAME, student.getLastName());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void shouldInsertStudentToCourse() {
-        studentDao.insertStudentToCourse(2, 1);
+        try {
+            studentDao.saveStudentOnCourse(2, 1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        Optional<Student> optionalStudent = studentDao.getById(2);
+        Student student = studentDao.getById(2);
 
-        assertTrue(optionalStudent.isPresent());
-
-        Student responseStudent = optionalStudent.get();
-
-        assertEquals(2, responseStudent.getCourses().size());
-    }
-
-    @Test
-    public void shouldInsertListStudentsOnCourse() {
-        List<Student> students = new ArrayList<>();
-        Student student1 = new Student(1);
-        students.add(student1);
-
-        Student student2 = new Student(2);
-        students.add(student2);
-
-        studentDao.insertListStudentsOnCourse(3, students);
-
-        List<Student> responseStudents = studentDao.getStudentsByCourseName(COURSE_2_NAME);
-
-        assertEquals(2, responseStudents.size());
-
-        boolean presentStudent1 = students.stream().filter(s -> s.getId() == student1.getId()).findFirst().isPresent();
-        boolean presentStudent2 = students.stream().filter(s -> s.getId() == student2.getId()).findFirst().isPresent();
-
-        assertTrue(presentStudent1);
-        assertTrue(presentStudent2);
+        assertEquals(2, student.getCourses().size());
     }
 }

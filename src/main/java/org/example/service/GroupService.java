@@ -1,15 +1,19 @@
 package org.example.service;
 
-import jakarta.transaction.Transactional;
 import org.example.dao.GroupDao;
 import org.example.dto.GroupDto;
 import org.example.mapper.GroupMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GroupService {
+    private final Logger logger = LoggerFactory.getLogger(GroupService.class);
     private final GroupDao groupDao;
     private final GroupMapper groupMapper;
 
@@ -18,33 +22,43 @@ public class GroupService {
         this.groupMapper = groupMapper;
     }
 
-    @Transactional
     public List<GroupDto> getGroupsLessOrEqualsStudents(int studentsAmount) {
-        return groupDao.getGroupLessOrEqualsStudents(studentsAmount).stream().map(groupMapper::toDto).toList();
+        List<GroupDto> groupsDto = new ArrayList<>();
+        try {
+            groupsDto = groupDao.findGroupLessOrEqualsStudents(studentsAmount).stream().map(groupMapper::toDto).toList();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return  groupsDto;
     }
 
-    @Transactional
     public void addGroup(GroupDto group) {
-        groupDao.insert(groupMapper.toEntity(group));
+        groupDao.save(groupMapper.toEntity(group));
     }
 
-    @Transactional
+
     public void addGroups(List<GroupDto> groups) {
-        groupDao.insertList(groups.stream().map(groupMapper::toEntity).toList());
+        groupDao.saveAll(groups.stream().map(groupMapper::toEntity).toList());
     }
 
-    @Transactional
     public List<GroupDto> getGroups() {
-        return groupDao.getAll().stream().map(groupMapper::toDto).toList();
+        return groupDao.findAll().stream().map(groupMapper::toDto).toList();
     }
 
-    @Transactional
     public GroupDto getGroupByName(String name) {
-        return groupDao.getGroupByName(name).map(groupMapper::toDto).orElse(null);
+        GroupDto groupDto = null;
+        try {
+            groupDto = groupDao.findByName(name).map(groupMapper::toDto).orElse(null);
+        } catch (SQLException e) {
+            logger.warn(String.format("Not found group by name = %s", name));
+            e.printStackTrace();
+        }
+
+        return groupDto;
     }
 
-    @Transactional
+
     public boolean isEmpty() {
-        return groupDao.isEmptyTable();
+        return groupDao.findAll().isEmpty();
     }
 }

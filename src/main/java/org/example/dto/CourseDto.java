@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CourseDto {
-    private int id;
+    private Integer id;
     private String name;
     private String description;
     private List<StudentDto> students;
@@ -13,18 +13,18 @@ public class CourseDto {
         students = new ArrayList<>();
     }
 
-    public CourseDto(int id, String name, String description, List<StudentDto> students) {
+    public CourseDto(Integer id, String name, String description, List<StudentDto> students) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.students = students;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -57,12 +57,12 @@ public class CourseDto {
     }
 
     public static class Builder {
-        private int id;
+        private Integer id;
         private String name;
         private String description;
         private List<StudentDto> students;
 
-        public Builder id(int id) {
+        public Builder id(Integer id) {
             this.id = id;
             return this;
         }
