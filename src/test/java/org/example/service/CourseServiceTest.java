@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.configuration.MapperConfiguration;
-import org.example.dao.CourseDao;
+import org.example.repository.CourseRepository;
 import org.example.dto.CourseDto;
 import org.example.dto.StudentDto;
 import org.example.entity.Course;
@@ -36,35 +36,27 @@ public class CourseServiceTest {
     private static final String STUDENT_2_LAST_NAME = "Григоренко";
 
     @MockBean
-    private CourseDao courseDao;
+    private CourseRepository courseRepository;
     @Autowired
     private CourseMapper mapper;
     private CourseService courseService;
 
     @BeforeAll
     public void init() {
-        courseService = new CourseService(courseDao, mapper);
+        courseService = new CourseService(courseRepository, mapper);
     }
 
     @Test
-    public void shouldReturnCourseWhenCorrectCourseName() {
+    public void shouldReturnCourseWhenCorrectCourseName() throws SQLException{
         Course correctCourse = new Course();
         correctCourse.setName(COURSE_NAME);
         correctCourse.setDescription(COURSE_DESCRIPTION);
 
-        try {
-            when(courseDao.findByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        when(courseRepository.findByName(COURSE_NAME)).thenReturn(Optional.of(correctCourse));
 
         CourseDto response = courseService.getCourseByName(COURSE_NAME);
 
-        try {
-            verify(courseDao).findByName(COURSE_NAME);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        verify(courseRepository).findByName(COURSE_NAME);
 
         assertEquals(correctCourse.getName(), response.getName());
         assertEquals(correctCourse.getDescription(), response.getDescription());
@@ -76,7 +68,7 @@ public class CourseServiceTest {
 
         courseService.addCourse(course);
 
-        verify(courseDao).save(any(Course.class));
+        verify(courseRepository).save(any(Course.class));
     }
 
     @Test
@@ -85,7 +77,7 @@ public class CourseServiceTest {
 
         courseService.addCourses(courses);
 
-        verify(courseDao).saveAll(anyList());
+        verify(courseRepository).saveAll(anyList());
     }
 
     @Test
@@ -111,7 +103,7 @@ public class CourseServiceTest {
 
         course.getStudents().add(student);
 
-        Mockito.when(courseDao.findAll()).thenReturn(courses);
+        Mockito.when(courseRepository.findAll()).thenReturn(courses);
 
         List<CourseDto> response = courseService.getAllCourses();
 
@@ -119,7 +111,7 @@ public class CourseServiceTest {
         StudentDto responseStudent1 = responseCourse.getStudents().get(0);
         StudentDto responseStudent2 = responseCourse.getStudents().get(1);
 
-        verify(courseDao).findAll();
+        verify(courseRepository).findAll();
 
         assertEquals(COURSE_NAME, responseCourse.getName());
         assertEquals(COURSE_DESCRIPTION, responseCourse.getDescription());

@@ -1,7 +1,7 @@
 package org.example.service;
 
 import jakarta.transaction.Transactional;
-import org.example.dao.StudentDao;
+import org.example.repository.StudentRepository;
 import org.example.dto.StudentDto;
 import org.example.mapper.StudentMapper;
 import org.slf4j.Logger;
@@ -15,48 +15,47 @@ import java.util.List;
 @Service
 public class StudentService {
     private final Logger logger = LoggerFactory.getLogger(StudentService.class);
-    private final StudentDao studentDao;
+    private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
 
-    public StudentService(StudentDao studentDao, StudentMapper studentMapper) {
-        this.studentDao = studentDao;
+    public StudentService(StudentRepository studentDao, StudentMapper studentMapper) {
+        this.studentRepository = studentDao;
         this.studentMapper = studentMapper;
     }
 
     public void addStudent(StudentDto student) {
-        studentDao.save(studentMapper.toEntity(student));
+        studentRepository.save(studentMapper.toEntity(student));
     }
 
     public void addStudents(List<StudentDto> students) {
-        studentDao.saveAll(students.stream().map(studentMapper::toEntity).toList());
+        studentRepository.saveAll(students.stream().map(studentMapper::toEntity).toList());
     }
 
     public StudentDto getStudentById(Integer id) {
-        return studentDao.findById(id).map(studentMapper::toDto).orElse(null);
+        return studentRepository.findById(id).map(studentMapper::toDto).orElse(null);
     }
 
     public List<StudentDto> getStudentsByCourseName(String courseName) {
-        List<StudentDto> studentsDto = new ArrayList<>();
         try {
-            studentsDto = studentDao.findAllStudentByCourseName(courseName).stream().map(studentMapper::toDto).toList();
+            return studentRepository.findAllStudentByCourseName(courseName).stream().map(studentMapper::toDto).toList();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return studentsDto;
+        return new ArrayList<>();
     }
 
     public void delete(StudentDto student) {
-        studentDao.deleteById(student.getId());
+        studentRepository.deleteById(student.getId());
     }
 
     public List<StudentDto> getStudents() {
-        return studentDao.findAll().stream().map(studentMapper::toDto).toList();
+        return studentRepository.findAll().stream().map(studentMapper::toDto).toList();
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
         try {
-            studentDao.saveStudentOnCourse(studentId, courseId);
+            studentRepository.saveStudentOnCourse(studentId, courseId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -65,8 +64,8 @@ public class StudentService {
     @Transactional
     public void addStudentsToCourse(int courseId, List<StudentDto> students) {
         try {
-            for (StudentDto student : students){
-                studentDao.saveStudentOnCourse(student.getId(), courseId);
+            for (StudentDto student : students) {
+                studentRepository.saveStudentOnCourse(student.getId(), courseId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,7 +74,7 @@ public class StudentService {
 
     public void deleteFromCourse(int studentId, int courseId) {
         try {
-            studentDao.deleteFromCourse(studentId, courseId);
+            studentRepository.deleteFromCourse(studentId, courseId);
         } catch (SQLException e) {
             logger.error(String.format("Error delete student from course: studentId = %d courseId = %d : {}",
                     studentId, courseId), e.getMessage(), e);
@@ -84,6 +83,6 @@ public class StudentService {
     }
 
     public boolean isEmpty() {
-        return studentDao.findAll().isEmpty();
+        return studentRepository.findAll().isEmpty();
     }
 }

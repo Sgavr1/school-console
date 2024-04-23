@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.dao.CourseDao;
+import org.example.repository.CourseRepository;
 import org.example.dto.CourseDto;
 import org.example.mapper.CourseMapper;
 import org.slf4j.Logger;
@@ -13,39 +13,38 @@ import java.util.List;
 @Service
 public class CourseService {
     private final Logger logger = LoggerFactory.getLogger(CourseService.class);
-    private final CourseDao courseDao;
+    private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
 
-    public CourseService(CourseDao courseDao, CourseMapper courseMapper) {
-        this.courseDao = courseDao;
+    public CourseService(CourseRepository courseDao, CourseMapper courseMapper) {
+        this.courseRepository = courseDao;
         this.courseMapper = courseMapper;
     }
 
     public void addCourse(CourseDto course) {
-        courseDao.save(courseMapper.toEntity(course));
+        courseRepository.save(courseMapper.toEntity(course));
     }
 
     public void addCourses(List<CourseDto> courses) {
-        courseDao.saveAll(courses.stream().map(courseMapper::toEntity).toList());
+        courseRepository.saveAll(courses.stream().map(courseMapper::toEntity).toList());
     }
 
     public CourseDto getCourseByName(String name) {
-        CourseDto courseDto = null;
         try {
-            courseDto = courseDao.findByName(name).map(courseMapper::toDto).orElse(null);
+            return courseRepository.findByName(name).map(courseMapper::toDto).orElse(null);
         } catch (SQLException e) {
             logger.warn(String.format("Not found course by name = %s", name));
             e.printStackTrace();
         }
 
-        return courseDto;
+        return null;
     }
 
     public List<CourseDto> getAllCourses() {
-        return courseDao.findAll().stream().map(courseMapper::toDto).toList();
+        return courseRepository.findAll().stream().map(courseMapper::toDto).toList();
     }
 
     public boolean isEmpty() {
-        return courseDao.findAll().isEmpty();
+        return courseRepository.findAll().isEmpty();
     }
 }

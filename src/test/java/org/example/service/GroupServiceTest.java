@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.configuration.MapperConfiguration;
-import org.example.dao.GroupDao;
+import org.example.repository.GroupRepository;
 import org.example.dto.GroupDto;
 import org.example.entity.Group;
 import org.example.mapper.GroupMapper;
@@ -28,42 +28,34 @@ public class GroupServiceTest {
     private static final String GROUP_NAME_1 = "AB-01";
     private static final String GROUP_NAME_2 = "SA-02";
     @MockBean
-    private GroupDao groupDao;
+    private GroupRepository groupRepository;
     @Autowired
     private GroupMapper mapper;
     private GroupService groupService;
 
     @BeforeAll
     public void init() {
-        groupService = new GroupService(groupDao, mapper);
+        groupService = new GroupService(groupRepository, mapper);
     }
 
     @Test
-    public void shouldReturnGroupWhenCorrectGroupName() {
+    public void shouldReturnGroupWhenCorrectGroupName() throws SQLException {
         Group group = new Group();
         group.setId(1);
         group.setName(GROUP_NAME_1);
 
-        try {
-            when(groupDao.findByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        when(groupRepository.findByName(GROUP_NAME_1)).thenReturn(Optional.of(group));
 
         GroupDto response = groupService.getGroupByName(GROUP_NAME_1);
 
-        try {
-            verify(groupDao).findByName(GROUP_NAME_1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        verify(groupRepository).findByName(GROUP_NAME_1);
 
         assertEquals(GROUP_NAME_1, response.getName());
         assertEquals(group.getId(), response.getId());
     }
 
     @Test
-    public void shouldReturnListGroupWhenNumbersStudentLessOrEqualsNumber() {
+    public void shouldReturnListGroupWhenNumbersStudentLessOrEqualsNumber() throws SQLException {
         List<Group> groups = new ArrayList<>();
         Group group = new Group();
         group.setId(1);
@@ -75,19 +67,11 @@ public class GroupServiceTest {
         group.setName(GROUP_NAME_2);
         groups.add(group);
 
-        try {
-            Mockito.when(groupDao.findGroupLessOrEqualsStudents(5)).thenReturn(groups);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Mockito.when(groupRepository.findGroupLessOrEqualsStudents(5)).thenReturn(groups);
 
         List<GroupDto> response = groupService.getGroupsLessOrEqualsStudents(5);
 
-        try {
-            verify(groupDao).findGroupLessOrEqualsStudents(5);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        verify(groupRepository).findGroupLessOrEqualsStudents(5);
 
         GroupDto responseGroup1 = response.get(0);
         GroupDto responseGroup2 = response.get(1);
@@ -104,7 +88,7 @@ public class GroupServiceTest {
 
         groupService.addGroup(group);
 
-        verify(groupDao).save(any(Group.class));
+        verify(groupRepository).save(any(Group.class));
 
     }
 
@@ -114,7 +98,7 @@ public class GroupServiceTest {
 
         groupService.addGroups(groups);
 
-        verify(groupDao).saveAll(anyList());
+        verify(groupRepository).saveAll(anyList());
     }
 
     @Test
@@ -130,11 +114,11 @@ public class GroupServiceTest {
 
         groups.add(group);
 
-        Mockito.when(groupDao.findAll()).thenReturn(groups);
+        Mockito.when(groupRepository.findAll()).thenReturn(groups);
 
         List<GroupDto> response = groupService.getGroups();
 
-        verify(groupDao).findAll();
+        verify(groupRepository).findAll();
 
         GroupDto responseGroup1 = response.get(0);
         GroupDto responseGroup2 = response.get(1);

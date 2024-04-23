@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.configuration.MapperConfiguration;
-import org.example.dao.StudentDao;
+import org.example.repository.StudentRepository;
 import org.example.dto.StudentDto;
 import org.example.entity.Group;
 import org.example.entity.Student;
@@ -31,14 +31,14 @@ public class StudentServiceTest {
     private static final String STUDENT_2_LAST_NAME = "Литвиненко";
     private static final String COURSE_NAME = "Вступ до програмування";
     @MockBean
-    private StudentDao studentDao;
+    private StudentRepository studentRepository;
     @Autowired
     private StudentMapper mapper;
     private StudentService studentService;
 
     @BeforeAll
     public void init() {
-        studentService = new StudentService(studentDao, mapper);
+        studentService = new StudentService(studentRepository, mapper);
     }
 
     @Test
@@ -49,11 +49,11 @@ public class StudentServiceTest {
         student.setLastName(STUDENT_1_LAST_NAME);
         student.setGroup(new Group(1));
 
-        Mockito.when(studentDao.findById(1)).thenReturn(Optional.of(student));
+        Mockito.when(studentRepository.findById(1)).thenReturn(Optional.of(student));
 
         StudentDto response = studentService.getStudentById(1);
 
-        verify(studentDao).findById(1);
+        verify(studentRepository).findById(1);
 
         assertEquals(1, response.getId());
         assertEquals(1, response.getGroupId());
@@ -62,7 +62,7 @@ public class StudentServiceTest {
     }
 
     @Test
-    public void shouldReturnByCourseName() {
+    public void shouldReturnByCourseName() throws SQLException {
         List<Student> students = new ArrayList<>();
 
         Student student1 = new Student(1);
@@ -79,19 +79,11 @@ public class StudentServiceTest {
 
         students.add(student2);
 
-        try {
-            Mockito.when(studentDao.findAllStudentByCourseName(COURSE_NAME)).thenReturn(students);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Mockito.when(studentRepository.findAllStudentByCourseName(COURSE_NAME)).thenReturn(students);
 
         List<StudentDto> responses = studentService.getStudentsByCourseName(COURSE_NAME);
 
-        try {
-            verify(studentDao).findAllStudentByCourseName(COURSE_NAME);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        verify(studentRepository).findAllStudentByCourseName(COURSE_NAME);
 
         StudentDto responseStudent1 = responses.get(0);
         StudentDto responseStudent2 = responses.get(1);
@@ -113,7 +105,7 @@ public class StudentServiceTest {
 
         studentService.addStudent(student);
 
-        verify(studentDao).save(any(Student.class));
+        verify(studentRepository).save(any(Student.class));
     }
 
     @Test
@@ -122,32 +114,24 @@ public class StudentServiceTest {
 
         studentService.addStudents(students);
 
-        verify(studentDao).saveAll(anyList());
+        verify(studentRepository).saveAll(anyList());
     }
 
     @Test
-    public void shouldAddStudentToCourse() {
+    public void shouldAddStudentToCourse() throws SQLException {
         studentService.addStudentToCourse(1, 1);
 
-        try {
-            verify(studentDao).saveStudentOnCourse(1, 1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        verify(studentRepository).saveStudentOnCourse(1, 1);
     }
 
     @Test
-    public void shouldAddStudentsToCourse() {
+    public void shouldAddStudentsToCourse() throws SQLException {
         List<StudentDto> students = new ArrayList<>();
         students.add(StudentDto.builder().build());
 
         studentService.addStudentsToCourse(1, students);
 
-        try {
-            verify(studentDao).saveStudentOnCourse(anyInt(), anyInt());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        verify(studentRepository).saveStudentOnCourse(anyInt(), anyInt());
     }
 
     @Test
@@ -156,7 +140,7 @@ public class StudentServiceTest {
 
         studentService.delete(student);
 
-        verify(studentDao).deleteById(any());
+        verify(studentRepository).deleteById(any());
     }
 
     @Test
@@ -174,11 +158,11 @@ public class StudentServiceTest {
         student2.setLastName(STUDENT_2_LAST_NAME);
         students.add(student2);
 
-        Mockito.when(studentDao.findAll()).thenReturn(students);
+        Mockito.when(studentRepository.findAll()).thenReturn(students);
 
         List<StudentDto> responses = studentService.getStudents();
 
-        verify(studentDao).findAll();
+        verify(studentRepository).findAll();
 
         StudentDto responseStudent1 = responses.get(0);
         StudentDto responseStudent2 = responses.get(1);
