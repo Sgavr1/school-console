@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.configuration.MapperConfiguration;
 import org.example.repository.StudentRepository;
 import org.example.dto.StudentDto;
 import org.example.entity.Group;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {MapperConfiguration.class})
+@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StudentServiceTest {
     private static final String STUDENT_1_FIRST_NAME = "Юлия";
@@ -131,7 +130,7 @@ public class StudentServiceTest {
 
         studentService.addStudentsToCourse(1, students);
 
-        verify(studentRepository).saveStudentOnCourse(anyInt(), anyInt());
+        verify(studentRepository).saveAllStudentsOnCourse(anyList(), anyInt());
     }
 
     @Test

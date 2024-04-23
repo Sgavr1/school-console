@@ -4,7 +4,7 @@ import org.example.dto.CourseDto;
 import org.example.entity.Course;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {StudentMapperIgnoreCourse.class})
+@Mapper(uses = {StudentMapperIgnoreCourse.class})
 public interface CourseMapper {
     @Mapping(source = "students", target = "students", qualifiedByName = "mapStudentsDto")
     CourseDto toDto(Course course);

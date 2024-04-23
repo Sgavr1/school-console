@@ -5,7 +5,7 @@ import org.example.entity.Group;
 import org.mapstruct.*;
 
 
-@Mapper(componentModel = "spring", uses = {StudentMapperIgnoreCourse.class})
+@Mapper(uses = {StudentMapperIgnoreCourse.class})
 public interface GroupMapper {
     @Mapping(source = "students", target = "students", qualifiedByName = "mapStudentsDto")
     GroupDto toDto(Group group);

@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.transaction.Transactional;
 import org.example.repository.GroupRepository;
 import org.example.dto.GroupDto;
 import org.example.mapper.GroupMapper;
@@ -17,11 +18,12 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
 
-    public GroupService(GroupRepository groupDao, GroupMapper groupMapper) {
-        this.groupRepository = groupDao;
+    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper) {
+        this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
     }
 
+    @Transactional
     public List<GroupDto> getGroupsLessOrEqualsStudents(int studentsAmount) {
         try {
             return groupRepository.findGroupLessOrEqualsStudents(studentsAmount).stream().map(groupMapper::toDto).toList();
@@ -31,19 +33,23 @@ public class GroupService {
         return new ArrayList<>();
     }
 
+    @Transactional
     public void addGroup(GroupDto group) {
         groupRepository.save(groupMapper.toEntity(group));
     }
 
 
+    @Transactional
     public void addGroups(List<GroupDto> groups) {
         groupRepository.saveAll(groups.stream().map(groupMapper::toEntity).toList());
     }
 
+    @Transactional
     public List<GroupDto> getGroups() {
         return groupRepository.findAll().stream().map(groupMapper::toDto).toList();
     }
 
+    @Transactional
     public GroupDto getGroupByName(String name) {
         try {
             return groupRepository.findByName(name).map(groupMapper::toDto).orElse(null);
@@ -55,7 +61,7 @@ public class GroupService {
         return null;
     }
 
-
+    @Transactional
     public boolean isEmpty() {
         return groupRepository.findAll().isEmpty();
     }

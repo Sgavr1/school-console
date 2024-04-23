@@ -1,5 +1,6 @@
 package org.example.service;
 
+import jakarta.transaction.Transactional;
 import org.example.repository.CourseRepository;
 import org.example.dto.CourseDto;
 import org.example.mapper.CourseMapper;
@@ -16,19 +17,22 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
 
-    public CourseService(CourseRepository courseDao, CourseMapper courseMapper) {
-        this.courseRepository = courseDao;
+    public CourseService(CourseRepository courseRepository, CourseMapper courseMapper) {
+        this.courseRepository = courseRepository;
         this.courseMapper = courseMapper;
     }
 
+    @Transactional
     public void addCourse(CourseDto course) {
         courseRepository.save(courseMapper.toEntity(course));
     }
 
+    @Transactional
     public void addCourses(List<CourseDto> courses) {
         courseRepository.saveAll(courses.stream().map(courseMapper::toEntity).toList());
     }
 
+    @Transactional
     public CourseDto getCourseByName(String name) {
         try {
             return courseRepository.findByName(name).map(courseMapper::toDto).orElse(null);
@@ -40,10 +44,12 @@ public class CourseService {
         return null;
     }
 
+    @Transactional
     public List<CourseDto> getAllCourses() {
         return courseRepository.findAll().stream().map(courseMapper::toDto).toList();
     }
 
+    @Transactional
     public boolean isEmpty() {
         return courseRepository.findAll().isEmpty();
     }

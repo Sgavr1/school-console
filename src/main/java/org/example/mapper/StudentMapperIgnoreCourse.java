@@ -17,4 +17,5 @@ public interface StudentMapperIgnoreCourse {
     @Mapping(target = "courses", ignore = true)
     @Mapping(source = "groupId", target = "group.id")
     Student toEntityIgnoreCourses(StudentDto studentDto);
+
 }

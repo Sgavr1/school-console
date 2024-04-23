@@ -93,4 +93,14 @@ public class StudentRepositoryTest {
 
         assertEquals(2, student.getCourses().size());
     }
+
+    @Test
+    public void shouldInsertStudentsToCourse() throws SQLException {
+        List<Integer> studentsId = List.of(2);
+        studentRepository.saveAllStudentsOnCourse(studentsId, 1);
+
+        Student responseStudent = studentRepository.getById(2);
+
+        assertEquals(2, responseStudent.getCourses().size());
+    }
 }

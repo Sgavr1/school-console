@@ -18,23 +18,27 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
 
-    public StudentService(StudentRepository studentDao, StudentMapper studentMapper) {
-        this.studentRepository = studentDao;
+    public StudentService(StudentRepository studentRepository, StudentMapper studentMapper) {
+        this.studentRepository = studentRepository;
         this.studentMapper = studentMapper;
     }
 
+    @Transactional
     public void addStudent(StudentDto student) {
         studentRepository.save(studentMapper.toEntity(student));
     }
 
+    @Transactional
     public void addStudents(List<StudentDto> students) {
         studentRepository.saveAll(students.stream().map(studentMapper::toEntity).toList());
     }
 
+    @Transactional
     public StudentDto getStudentById(Integer id) {
         return studentRepository.findById(id).map(studentMapper::toDto).orElse(null);
     }
 
+    @Transactional
     public List<StudentDto> getStudentsByCourseName(String courseName) {
         try {
             return studentRepository.findAllStudentByCourseName(courseName).stream().map(studentMapper::toDto).toList();
@@ -45,14 +49,17 @@ public class StudentService {
         return new ArrayList<>();
     }
 
+    @Transactional
     public void delete(StudentDto student) {
         studentRepository.deleteById(student.getId());
     }
 
+    @Transactional
     public List<StudentDto> getStudents() {
         return studentRepository.findAll().stream().map(studentMapper::toDto).toList();
     }
 
+    @Transactional
     public void addStudentToCourse(int studentId, int courseId) {
         try {
             studentRepository.saveStudentOnCourse(studentId, courseId);
@@ -64,14 +71,15 @@ public class StudentService {
     @Transactional
     public void addStudentsToCourse(int courseId, List<StudentDto> students) {
         try {
-            for (StudentDto student : students) {
-                studentRepository.saveStudentOnCourse(student.getId(), courseId);
-            }
+            List<Integer> studentsId = students.stream().map(student -> student.getId()).toList();
+
+            studentRepository.saveAllStudentsOnCourse(studentsId, courseId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    @Transactional
     public void deleteFromCourse(int studentId, int courseId) {
         try {
             studentRepository.deleteFromCourse(studentId, courseId);
@@ -82,6 +90,7 @@ public class StudentService {
         }
     }
 
+    @Transactional
     public boolean isEmpty() {
         return studentRepository.findAll().isEmpty();
     }

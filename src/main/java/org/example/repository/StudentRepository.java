@@ -4,6 +4,7 @@ import org.example.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
@@ -17,6 +18,13 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Modifying
     @Query(value = "INSERT INTO student_course(student_id, course_id) VALUES (?, ?);", nativeQuery = true)
     void saveStudentOnCourse(Integer studentId, Integer courseId) throws SQLException;
+
+    @Modifying
+    @Query(
+            value = "INSERT INTO student_course(student_id, course_id) SELECT student_id, :courseId FROM students WHERE student_id IN (:studentIds);",
+            nativeQuery = true
+    )
+    void saveAllStudentsOnCourse(@Param("studentIds") List<Integer> studentIds, @Param("courseId") Integer courseId) throws SQLException;
 
     @Modifying
     @Query(value = "DELETE FROM student_course WHERE student_id = ? AND course_id = ?;", nativeQuery = true)

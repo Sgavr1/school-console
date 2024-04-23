@@ -31,4 +31,5 @@ public class MapperConfiguration {
     public CourseMapperIgnoreStudent getCourseMapperIgnoreStudent() {
         return Mappers.getMapper(CourseMapperIgnoreStudent.class);
     }
+
 }

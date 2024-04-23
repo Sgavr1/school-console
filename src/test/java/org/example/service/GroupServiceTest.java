@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.configuration.MapperConfiguration;
 import org.example.repository.GroupRepository;
 import org.example.dto.GroupDto;
 import org.example.entity.Group;
@@ -21,7 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {MapperConfiguration.class})
+@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GroupServiceTest {
 
@@ -98,7 +97,7 @@ public class GroupServiceTest {
 
         groupService.addGroups(groups);
 
-        verify(groupRepository).saveAll(anyList());
+        verify(groupRepository, atLeastOnce()).saveAll(anyList());
     }
 
     @Test
